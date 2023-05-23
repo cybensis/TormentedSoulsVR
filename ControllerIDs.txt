@@ -1,0 +1,30 @@
+
+[Warning: Unity Log] Starting joystick 0
+[Warning: Unity Log] Starting map2 0 0
+[Warning: Unity Log] D-Pad Up is assigned to Button 11 with the Action Vertical DPAD with actionId 8
+[Warning: Unity Log] D-Pad Down is assigned to Button 13 with the Action Vertical DPAD with actionId 8
+[Warning: Unity Log] D-Pad Left is assigned to Button 14 with the Action Horizontal DPAD with actionId 7
+[Warning: Unity Log] D-Pad Right is assigned to Button 12 with the Action Horizontal DPAD with actionId 7
+[Warning: Unity Log] D-Pad Up is assigned to Button 11 with the Action OpenDebugMenuA with actionId 24
+[Warning: Unity Log] D-Pad Down is assigned to Button 13 with the Action AddItemsButtonA with actionId 22
+[Warning: Unity Log] A is assigned to Button 0 with the Action Confirm with actionId 0
+[Warning: Unity Log] B is assigned to Button 1 with the Action Cancel with actionId 1
+[Warning: Unity Log] Right Shoulder is assigned to Button 5 with the Action Aim with actionId 2 
+[Warning: Unity Log] A is assigned to Button 0 with the Action Shoot with actionId 21
+[Warning: Unity Log] X is assigned to Button 2 with the Action Run with actionId 4
+[Warning: Unity Log] Y is assigned to Button 3 with the Action Menu with actionId 11
+[Warning: Unity Log] Back is assigned to Button 6 with the Action ShowInputDebug with actionId 12
+[Warning: Unity Log] B is assigned to Button 1 with the Action Reload with actionId 13
+[Warning: Unity Log] Start is assigned to Button 7 with the Action Options with actionId 14
+[Warning: Unity Log] Right Stick Button is assigned to Button 10 with the Action LanternSwitch with actionId 15 
+[Warning: Unity Log] Left Shoulder is assigned to Button 4 with the Action SkipLeft with actionId 18
+[Warning: Unity Log] Right Shoulder is assigned to Button 5 with the Action SkipRight with actionId 19
+[Warning: Unity Log] Left Stick X is assigned to Axis 0 with the Action Horizontal Axis with actionId 5 
+[Warning: Unity Log] Left Stick Y is assigned to Axis 1 with the Action Vertical Axis with actionId 6
+[Warning: Unity Log] Left Trigger is assigned to Axis 4 with the Action Aim with actionId 2
+[Warning: Unity Log] Right Trigger is assigned to Axis 5 with the Action Shoot with actionId 21 
+[Warning: Unity Log] Right Stick X is assigned to Axis 2 with the Action Right Horizontal Axis with actionId 16 
+[Warning: Unity Log] Right Stick Y is assigned to Axis 3 with the Action Right Vertical Axis with actionId 17
+[Warning: Unity Log] Left Trigger is assigned to Axis 4 with the Action TestingModifier with actionId 23
+
+[Warning: Unity Log] LogAllGameActions ended
