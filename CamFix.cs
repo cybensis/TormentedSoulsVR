@@ -15,9 +15,9 @@ namespace TormentedSoulsVR
     [HarmonyPatch]
     internal class CamFix
     {
-        private static GameObject camHolder;
-        private static GameObject vrCamera;
-        private static GameObject camRoot;
+        public static GameObject camHolder;
+        public static GameObject vrCamera;
+        public static GameObject camRoot;
 
         private static bool vrStarted = false;
 
@@ -37,7 +37,8 @@ namespace TormentedSoulsVR
                 UnityEngine.Object.DontDestroyOnLoad(camRoot);
             }
             Vector3 newPos = vrCamera.transform.localPosition * -1;
-            newPos.y += 1.7f;
+            newPos.y += 1.575f;
+            newPos.z += 0.05f;
             camHolder.transform.localPosition = newPos;
             camRoot.transform.position = __instance.transform.position;
             camRoot.transform.rotation = __instance.transform.rotation;
@@ -253,7 +254,7 @@ namespace TormentedSoulsVR
             __instance.SetIsMakingSound(__instance.IsRunning(num6));
             //Vector3 movementVector = new Vector3(vector.x, 0f, vector.y);
             //movementVector.Normalize();
-            float rotationSpeed = 100f; // Adjust the value as needed
+            float rotationSpeed = 100f; 
 
             // Calculate the rotation amount based on the joystick rotation
             float rotationAmount = SteamVR_Actions._default.RightJoystick.axis.x * rotationSpeed * Time.deltaTime;
@@ -295,7 +296,6 @@ namespace TormentedSoulsVR
             int[] childrenMeshesToDisable = { 0, 9, 14, 15, 16, 17, 18, 20, 23, 27, 28 };
             if (childrenMeshesToDisable[childrenMeshesToDisable.Length - 1] + 1 != __instance.transform.childCount)
                 return;
-            Debug.LogWarning("AAAAAAAAAAAA");
             for (int i = 0; i < childrenMeshesToDisable.Length; i++) {
                 __instance.transform.GetChild(childrenMeshesToDisable[i]).GetComponent<SkinnedMeshRenderer>().enabled = false;
             }

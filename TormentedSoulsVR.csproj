@@ -39,6 +39,9 @@
     <Reference Include="Rewired_Windows">
       <HintPath>libs\Rewired_Windows.dll</HintPath>
     </Reference>
+    <Reference Include="Sirenix.Serialization">
+      <HintPath>libs\Managed\Sirenix.Serialization.dll</HintPath>
+    </Reference>
     <Reference Include="SteamVR">
       <HintPath>libs\Managed\SteamVR.dll</HintPath>
     </Reference>
