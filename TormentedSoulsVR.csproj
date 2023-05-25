@@ -69,5 +69,17 @@
     <Reference Include="Unity.XR.OpenXR.Features.RuntimeDebugger">
       <HintPath>libs\Managed\Unity.XR.OpenXR.Features.RuntimeDebugger.dll</HintPath>
     </Reference>
+    <Reference Include="UnityEngine">
+      <HintPath>libs\UnityEngine.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.CoreModule">
+      <HintPath>libs\UnityEngine.CoreModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.PhysicsModule">
+      <HintPath>libs\UnityEngine.PhysicsModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.UI">
+      <HintPath>libs\UnityEngine.UI.dll</HintPath>
+    </Reference>
   </ItemGroup>
 </Project>
