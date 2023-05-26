@@ -45,7 +45,21 @@ namespace TormentedSoulsVR
         }
 
         private void Update() {
-            Controllers.Update();   
+            Controllers.Update();
+            if (CamFix.inCinematic && CamFix.camRoot != null)
+            {
+                CamFix.camRoot.transform.position = Camera.main.transform.position + CamFix.vrCamera.transform.localPosition * -1;
+                //CamFix.camHolder.transform.localPosition = CamFix.vrCamera.transform.localPosition * -1;
+                CamFix.camRoot.transform.rotation = Quaternion.Euler(0, Camera.main.transform.eulerAngles.y, 0);
+            }
+            else if (PlayerController.instance != null) {
+                Vector3 newPos = CamFix.vrCamera.transform.localPosition * -1;
+                newPos.y += 1.575f;
+                newPos.z += 0.05f;
+                CamFix.camHolder.transform.localPosition = newPos;
+                CamFix.camRoot.transform.position = PlayerController.instance.transform.position;
+                CamFix.camRoot.transform.rotation = PlayerController.instance.transform.rotation;
+            }
         }
     }
 }

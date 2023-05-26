@@ -16,69 +16,159 @@ namespace TormentedSoulsVR
     internal class CamFix
     {
         public static GameObject camHolder;
-        public static GameObject vrCamera;
+        public static Camera vrCamera;
         public static GameObject camRoot;
 
         private static bool vrStarted = false;
 
+        public static bool inCinematic = false;
+
+        //[HarmonyPostfix]
+        //[HarmonyPatch(typeof(PlayerController), "Update")]
+        //private static void FixCameraOnPlayer(PlayerController __instance)
+        //{
+        //    //if (camRoot == null)
+        //    //{
+        //    //    camRoot = new GameObject("camRoot");
+        //    //    camHolder = new GameObject("camHolder");
+        //    //    camHolder.transform.parent = camRoot.transform;
+
+        //    //    vrCamera = new GameObject("VRCamera").AddComponent<Camera>();
+        //    //    vrCamera.transform.parent = camHolder.transform;
+        //    //    vrCamera.nearClipPlane = 0.001f;
+        //    //    vrCamera.gameObject.AddComponent<SteamVR_TrackedObject>();
+        //    //    vrCamera.nearClipPlane = 0.001f;
+        //    //    vrCamera.backgroundColor = Color.black;
+        //    //    UnityEngine.Object.DontDestroyOnLoad(camRoot);
+        //    //}
+        //    Vector3 newPos = vrCamera.transform.localPosition * -1;
+        //    newPos.y += 1.575f;
+        //    newPos.z += 0.05f;
+        //    camHolder.transform.localPosition = newPos;
+        //    camRoot.transform.position = __instance.transform.position;
+        //    camRoot.transform.rotation = __instance.transform.rotation;
+
+        //}
+
+
         [HarmonyPostfix]
-        [HarmonyPatch(typeof(PlayerController), "Update")]
-        private static void FixCameraOnPlayer(PlayerController __instance)
+        [HarmonyPatch(typeof(PlayerDetector), "SetEnabled")]
+        private static void injeedctVR(ViewOptionsMenu __instance) {
+            CamFix.inCinematic = true;
+            Debug.LogWarning("ENABLED");
+        }
+
+        [HarmonyPostfix]
+        [HarmonyPatch(typeof(PlayerDetector), "OnDisable")]
+        private static void wwfd(ViewOptionsMenu __instance)
         {
-            if (camRoot == null)
-            {
-                camRoot = new GameObject("camRoot");
-                camHolder = new GameObject("camHolder");
-                vrCamera = new GameObject("VRCamera");
-                vrCamera.transform.parent = camHolder.transform;
-                camHolder.transform.parent = camRoot.transform;
-                vrCamera.AddComponent<Camera>().nearClipPlane = 0.001f;
-                vrCamera.AddComponent<SteamVR_TrackedObject>();
-                UnityEngine.Object.DontDestroyOnLoad(camRoot);
-            }
-            Vector3 newPos = vrCamera.transform.localPosition * -1;
-            newPos.y += 1.575f;
-            newPos.z += 0.05f;
-            camHolder.transform.localPosition = newPos;
-            camRoot.transform.position = __instance.transform.position;
-            camRoot.transform.rotation = __instance.transform.rotation;
+            Debug.LogWarning("DISABLE");
 
         }
+        [HarmonyPostfix]
+        [HarmonyPatch(typeof(PlayerDetector), "ForcePlayerExitFromCollider")]
+        private static void wwww(ViewOptionsMenu __instance)
+        {
+            Debug.LogWarning("ForcePlayerExitFromCollider");
+            CamFix.inCinematic = true;
+
+        }
+
+        [HarmonyPostfix]
+        [HarmonyPatch(typeof(PlayerController), "OnEnable")]
+        private static void ReturnCamViewToPlayer(ViewOptionsMenu __instance)
+        {
+            CamFix.inCinematic = false;
+
+        }
+
 
         [HarmonyPostfix]
         [HarmonyPatch(typeof(ViewOptionsMenu), "Start")]
         private static void injeectVR(ViewOptionsMenu __instance)
         {
+            //if (!vrStarted && GameDB.instance != null)
             if (!vrStarted && GameDB.instance != null)
             {
-                GameDB.instance.gameObject.AddComponent<test>();
                 vrStarted = true;
-                // When returning from the game to the main menu, it deletes the controller scheme so we have to reset it here
-
                 if (camRoot == null)
                 {
+                    GameDB.instance.gameObject.AddComponent<test>();
                     camRoot = new GameObject("camRoot");
                     camHolder = new GameObject("camHolder");
-                    vrCamera = new GameObject("VRCamera");
-                    vrCamera.transform.parent = camHolder.transform;
                     camHolder.transform.parent = camRoot.transform;
-                    Camera cam = vrCamera.AddComponent<Camera>();
-                    cam.nearClipPlane = 0.001f;
-                    cam.backgroundColor = Color.black;
-                    vrCamera.AddComponent<SteamVR_TrackedObject>();
+                    vrCamera = new GameObject("VRCamera").AddComponent<Camera>();
+                    vrCamera.transform.parent = camHolder.transform;
+                    vrCamera.nearClipPlane = 0.001f;
+                    vrCamera.backgroundColor = Color.black;
+                    vrCamera.gameObject.AddComponent<SteamVR_TrackedObject>();
                     UnityEngine.Object.DontDestroyOnLoad(camRoot);
 
                 }
-
+                else {
+                    camRoot.transform.position = Vector3.zero;
+                    camRoot.transform.rotation = Quaternion.identity;
+                    camRoot.transform.localRotation = Quaternion.identity;
+                }
                 Canvas mainScreenCanvas = __instance.transform.parent.GetComponent<Canvas>();
                 mainScreenCanvas.renderMode = RenderMode.WorldSpace;
                 mainScreenCanvas.transform.localScale = new Vector3(0.002f, 0.002f, 0.002f);
                 mainScreenCanvas.transform.position = new Vector3(0, 1, 4.3f);
                 camHolder.transform.localPosition = vrCamera.transform.localPosition * -1;
 
-
             }
         }
+
+
+        // Sets up the main menu screen to select the first available button
+        [HarmonyPrefix]
+        [HarmonyPatch(typeof(ExitGameWaringController), "ButtonPressed")]
+        private static void ResetCanvasOnReturnToMenu(ExitGameWaringController __instance, bool exitButton)
+        {
+            if (exitButton) { 
+                // Change vrStarted to false so it will fix the main menus position and everything when returning to menu
+                vrStarted = false;
+                // Delete the in-game menu manager as its regenerated when loading a save or starting a new game
+                if (camRoot.transform.childCount >= 2)
+                    UnityEngine.Object.Destroy(camRoot.transform.GetChild(1).gameObject);
+            }
+        }
+
+
+        //[HarmonyPostfix]
+        //[HarmonyPatch(typeof(ViewOptionsMenu), "Reset")]
+        //private static void injeecdtVR(ViewOptionsMenu __instance)
+        //{
+        //    if (!vrStarted && GameDB.instance != null)
+        //    {
+        //        GameDB.instance.gameObject.AddComponent<test>();
+        //        vrStarted = true;
+        //        // When returning from the game to the main menu, it deletes the controller scheme so we have to reset it here
+
+        //        if (camRoot == null)
+        //        {
+        //            camRoot = new GameObject("camRoot");
+        //            camHolder = new GameObject("camHolder");
+        //            vrCamera = new GameObject("VRCamera");
+        //            vrCamera.transform.parent = camHolder.transform;
+        //            camHolder.transform.parent = camRoot.transform;
+        //            Camera cam = vrCamera.AddComponent<Camera>();
+        //            cam.nearClipPlane = 0.001f;
+        //            cam.backgroundColor = Color.black;
+        //            vrCamera.AddComponent<SteamVR_TrackedObject>();
+        //            UnityEngine.Object.DontDestroyOnLoad(camRoot);
+
+        //        }
+
+        //        Canvas mainScreenCanvas = __instance.transform.parent.GetComponent<Canvas>();
+        //        mainScreenCanvas.renderMode = RenderMode.WorldSpace;
+        //        mainScreenCanvas.transform.localScale = new Vector3(0.002f, 0.002f, 0.002f);
+        //        mainScreenCanvas.transform.position = new Vector3(0, 1, 4.3f);
+        //        camHolder.transform.localPosition = vrCamera.transform.localPosition * -1;
+
+
+        //    }
+        //}
 
 
         [HarmonyPrefix]
