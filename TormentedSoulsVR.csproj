@@ -33,6 +33,9 @@
     <Reference Include="Assembly-CSharp-firstpass">
       <HintPath>libs\Assembly-CSharp-firstpass.dll</HintPath>
     </Reference>
+    <Reference Include="Cinemachine">
+      <HintPath>libs\Cinemachine.dll</HintPath>
+    </Reference>
     <Reference Include="Rewired_Core">
       <HintPath>libs\Rewired_Core.dll</HintPath>
     </Reference>

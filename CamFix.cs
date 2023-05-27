@@ -2,6 +2,7 @@
 using Rewired;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.Eventing.Reader;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -18,11 +19,21 @@ namespace TormentedSoulsVR
         public static GameObject camHolder;
         public static Camera vrCamera;
         public static GameObject camRoot;
+        public static GameplayMenuManager menus;
+
+        public static PlayerController player;
 
         private static bool vrStarted = false;
 
         public static bool inCinematic = false;
 
+        public static bool inIntro = true;
+
+        public static bool onTapeRecorder = false;
+
+        public static Vector3 headsetPos = Vector3.zero;
+
+        public static test VRHandler;
         //[HarmonyPostfix]
         //[HarmonyPatch(typeof(PlayerController), "Update")]
         //private static void FixCameraOnPlayer(PlayerController __instance)
@@ -51,35 +62,105 @@ namespace TormentedSoulsVR
         //}
 
 
-        [HarmonyPostfix]
-        [HarmonyPatch(typeof(PlayerDetector), "SetEnabled")]
-        private static void injeedctVR(ViewOptionsMenu __instance) {
-            CamFix.inCinematic = true;
-            Debug.LogWarning("ENABLED");
-        }
+        //[HarmonyPostfix]
+        //[HarmonyPatch(typeof(PlayerDetector), "SetEnabled")]
+        //private static void injeedctVR(ViewOptionsMenu __instance) {
+        //    CamFix.inCinematic = true;
+        //    Debug.LogWarning("ENABLED");
+        //}
 
         [HarmonyPostfix]
         [HarmonyPatch(typeof(PlayerDetector), "OnDisable")]
-        private static void wwfd(ViewOptionsMenu __instance)
+        private static void wwfd(PlayerController __instance)
         {
             Debug.LogWarning("DISABLE");
 
         }
         [HarmonyPostfix]
         [HarmonyPatch(typeof(PlayerDetector), "ForcePlayerExitFromCollider")]
-        private static void wwww(ViewOptionsMenu __instance)
+        private static void wwww(PlayerDetector __instance)
         {
             Debug.LogWarning("ForcePlayerExitFromCollider");
             CamFix.inCinematic = true;
+            headsetPos = CamFix.vrCamera.transform.localPosition;
+            if (__instance.transform.parent.parent.parent.parent.name == "TapeRecorder") {
+                VRHandler.SetMenuPosOnSave();
+            }
 
         }
 
         [HarmonyPostfix]
         [HarmonyPatch(typeof(PlayerController), "OnEnable")]
-        private static void ReturnCamViewToPlayer(ViewOptionsMenu __instance)
+        private static void ReturnCamViewToPlayerOnEnable(PlayerController __instance)
         {
+            Debug.LogWarning("OnEnable");
             CamFix.inCinematic = false;
+            player = __instance;
+            VRHandler.SetMenuPosOnExitSave();
+        }
 
+        [HarmonyPostfix]
+        [HarmonyPatch(typeof(PlayerController), "Awake")]
+        private static void ReturnCamViewToPlayerOnAwake(PlayerController __instance)
+        {
+            Debug.LogWarning("Awake");
+            CamFix.inCinematic = false;
+            player = __instance;
+        }
+
+
+        //[HarmonyPostfix]
+        //[HarmonyPatch(typeof(PlayerController), "OnDestroy")]
+        //private static void UnsetPlayer(PlayerController __instance)
+        //{
+        //    Debug.LogWarning("OnDestroy");
+        //    player = null;
+        //}
+
+
+        [HarmonyPostfix]
+        [HarmonyPatch(typeof(PlayerController), "InitializeStates")]
+        private static void ReturnCamViewToPlayerOnInit(PlayerController __instance)
+        {
+            Debug.LogWarning("InitializeStates");
+
+            player = __instance;
+        }
+
+        [HarmonyPostfix]
+        [HarmonyPatch(typeof(PlayerController), "SpawnPlayerOnPosition")]
+        private static void ReturnCamViewToPlayerOnSpawn(PlayerController __instance)
+        {
+            Debug.LogWarning("SpawnPlayerOnPosition");
+
+            if (camRoot.transform.childCount >= 2) { 
+                camRoot.transform.GetChild(1).localRotation = Quaternion.identity;
+
+            }
+            player = __instance;
+        }
+
+
+        [HarmonyPrefix]
+        [HarmonyPatch(typeof(ActorEvent_VirtualCamera), "Start")]
+        private static void SetVirtualCamPosition(ActorEvent_VirtualCamera __instance)
+        {
+            Debug.LogWarning("VCAM START");
+            if (__instance.name == "ShelfCamera")
+                __instance.virtualCamera.transform.position = new Vector3(1.918f, 1.6789f, -21.771f);
+            else if (__instance.name == "PadlockCameraActor")
+                __instance.virtualCamera.transform.position = new Vector3(2.0541f, 1.6139f, -22.03f);
+            else if (__instance.name == "DoorCameraActor")
+                __instance.virtualCamera.transform.position = new Vector3(-0.753f, 0.9859f, -20.391f);
+            else if (__instance.transform.parent.parent.name == "TapeRecorder" && SceneManager.GetActiveScene().name == "ExamRoom")
+            {
+                __instance.virtualCamera.transform.position = new Vector3(-6.4162f, 1.4941f, -0.3169f);
+                __instance.virtualCamera.transform.localRotation = Quaternion.Euler(0f, 268f, 0f);
+            }
+            else if (SceneManager.GetActiveScene().name == "SewingRoom") {
+                __instance.virtualCamera.transform.position = new Vector3(-2.7388f, 1.4861f, -1.3017f);
+                __instance.virtualCamera.transform.localRotation = Quaternion.Euler(0f, 354f, 0f);
+            }
         }
 
 
@@ -93,7 +174,7 @@ namespace TormentedSoulsVR
                 vrStarted = true;
                 if (camRoot == null)
                 {
-                    GameDB.instance.gameObject.AddComponent<test>();
+                    VRHandler = GameDB.instance.gameObject.AddComponent<test>();
                     camRoot = new GameObject("camRoot");
                     camHolder = new GameObject("camHolder");
                     camHolder.transform.parent = camRoot.transform;
@@ -103,6 +184,7 @@ namespace TormentedSoulsVR
                     vrCamera.backgroundColor = Color.black;
                     vrCamera.gameObject.AddComponent<SteamVR_TrackedObject>();
                     UnityEngine.Object.DontDestroyOnLoad(camRoot);
+                    headsetPos = CamFix.vrCamera.transform.localPosition;
 
                 }
                 else {
@@ -128,6 +210,7 @@ namespace TormentedSoulsVR
             if (exitButton) { 
                 // Change vrStarted to false so it will fix the main menus position and everything when returning to menu
                 vrStarted = false;
+                inCinematic = false;
                 // Delete the in-game menu manager as its regenerated when loading a save or starting a new game
                 if (camRoot.transform.childCount >= 2)
                     UnityEngine.Object.Destroy(camRoot.transform.GetChild(1).gameObject);
@@ -135,40 +218,7 @@ namespace TormentedSoulsVR
         }
 
 
-        //[HarmonyPostfix]
-        //[HarmonyPatch(typeof(ViewOptionsMenu), "Reset")]
-        //private static void injeecdtVR(ViewOptionsMenu __instance)
-        //{
-        //    if (!vrStarted && GameDB.instance != null)
-        //    {
-        //        GameDB.instance.gameObject.AddComponent<test>();
-        //        vrStarted = true;
-        //        // When returning from the game to the main menu, it deletes the controller scheme so we have to reset it here
-
-        //        if (camRoot == null)
-        //        {
-        //            camRoot = new GameObject("camRoot");
-        //            camHolder = new GameObject("camHolder");
-        //            vrCamera = new GameObject("VRCamera");
-        //            vrCamera.transform.parent = camHolder.transform;
-        //            camHolder.transform.parent = camRoot.transform;
-        //            Camera cam = vrCamera.AddComponent<Camera>();
-        //            cam.nearClipPlane = 0.001f;
-        //            cam.backgroundColor = Color.black;
-        //            vrCamera.AddComponent<SteamVR_TrackedObject>();
-        //            UnityEngine.Object.DontDestroyOnLoad(camRoot);
-
-        //        }
-
-        //        Canvas mainScreenCanvas = __instance.transform.parent.GetComponent<Canvas>();
-        //        mainScreenCanvas.renderMode = RenderMode.WorldSpace;
-        //        mainScreenCanvas.transform.localScale = new Vector3(0.002f, 0.002f, 0.002f);
-        //        mainScreenCanvas.transform.position = new Vector3(0, 1, 4.3f);
-        //        camHolder.transform.localPosition = vrCamera.transform.localPosition * -1;
-
-
-        //    }
-        //}
+  
 
 
         [HarmonyPrefix]
@@ -383,6 +433,7 @@ namespace TormentedSoulsVR
         [HarmonyPatch(typeof(BloodBehaviour), "Start")]
         public static void DisableHeadMeshes(BloodBehaviour __instance)
         {
+            headsetPos = CamFix.vrCamera.transform.localPosition;
             int[] childrenMeshesToDisable = { 0, 9, 14, 15, 16, 17, 18, 20, 23, 27, 28 };
             if (childrenMeshesToDisable[childrenMeshesToDisable.Length - 1] + 1 != __instance.transform.childCount)
                 return;

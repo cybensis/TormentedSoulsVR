@@ -110,7 +110,7 @@ namespace TormentedSoulsVR
         [HarmonyPatch(typeof(ItemObsClick), "Setup")]
         private static void DisableColliderMesh(ItemObsClick __instance)
         {
-            if (__instance.name == "DireccionCollider" || __instance.name == "AbrirCollider")
+            if (__instance.name == "DireccionCollider" || __instance.name == "AbrirCollider" || __instance.name == "TextoCollider" || __instance.name == "FotoCollider")
             {
                 UnityEngine.MeshFilter filter = __instance.GetComponent<MeshFilter>();
                 // The colliders for the intro letter are visible for some reason so hide them with this
@@ -122,6 +122,7 @@ namespace TormentedSoulsVR
                     gui3dObject.GetChild(2).gameObject.SetActive(true);
                     gui3dObject.GetChild(2).GetComponent<UnityEngine.Light>().intensity = 1.25f;
                     gui3dObject.GetChild(5).gameObject.SetActive(true);
+                    CamFix.inIntro = true;
                 }
             }
         }
@@ -137,6 +138,8 @@ namespace TormentedSoulsVR
                 Transform gui3dObject = CamFix.camRoot.transform.GetChild(1).GetChild(2);
                 gui3dObject.GetChild(2).gameObject.SetActive(false);
                 gui3dObject.GetChild(5).gameObject.SetActive(false);
+                CamFix.inIntro = false;
+                CamFix.headsetPos = CamFix.vrCamera.transform.localPosition;
             }
         }
     }

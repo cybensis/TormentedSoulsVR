@@ -32,6 +32,7 @@ namespace TormentedSoulsVR.UI
             currentButton = (NavItemButton)__instance.navItems[0];
             currentButtonBehaviour = currentButton.GetTransform().GetComponent<ItemOptionMenuButtonBehaviour>();
             currentButtonBehaviour.SelectButton(true);
+            CamFix.inCinematic = false;
             if (CamFix.camHolder != null)
                 CamFix.camHolder.transform.localPosition = Vector3.zero;
         }
@@ -206,7 +207,7 @@ namespace TormentedSoulsVR.UI
         }
 
 
-        // Sets up the main menu screen to select the first available button
+
         [HarmonyPrefix]
         [HarmonyPatch(typeof(OptionsMenuController), "OnPressedBackOnPanel")]
         private static bool www(OptionsMenuController __instance, OptionMenuPanelData panel)

@@ -13,7 +13,7 @@ public static class CameraManager
         if (VROrigin == null)
         {
             VROrigin = new GameObject();
-            VROrigin.transform.Rotate(0f, 270f, 0f, Space.Self);
+            //VROrigin.transform.Rotate(0f, 270f, 0f, Space.Self);
         }
         //VROrigin.transform.parent = Camera.main.transform.parent.parent;
         SpawnHands();
