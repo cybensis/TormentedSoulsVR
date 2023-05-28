@@ -1,14 +1,11 @@
 ﻿using HarmonyLib;
-using Rewired;
 using System;
-using System.Collections.Generic;
-using System.Diagnostics.Eventing.Reader;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Unity.Rendering;
 using UnityEngine;
+using UnityEngine.Rendering.PostProcessing;
 using UnityEngine.SceneManagement;
 using Valve.VR;
+using static FlowDirectorManager;
 using static Rewired.ComponentControls.Effects.RotateAroundAxis;
 
 namespace TormentedSoulsVR
@@ -33,58 +30,39 @@ namespace TormentedSoulsVR
 
         public static Vector3 headsetPos = Vector3.zero;
 
-        public static test VRHandler;
-        //[HarmonyPostfix]
-        //[HarmonyPatch(typeof(PlayerController), "Update")]
-        //private static void FixCameraOnPlayer(PlayerController __instance)
-        //{
-        //    //if (camRoot == null)
-        //    //{
-        //    //    camRoot = new GameObject("camRoot");
-        //    //    camHolder = new GameObject("camHolder");
-        //    //    camHolder.transform.parent = camRoot.transform;
-
-        //    //    vrCamera = new GameObject("VRCamera").AddComponent<Camera>();
-        //    //    vrCamera.transform.parent = camHolder.transform;
-        //    //    vrCamera.nearClipPlane = 0.001f;
-        //    //    vrCamera.gameObject.AddComponent<SteamVR_TrackedObject>();
-        //    //    vrCamera.nearClipPlane = 0.001f;
-        //    //    vrCamera.backgroundColor = Color.black;
-        //    //    UnityEngine.Object.DontDestroyOnLoad(camRoot);
-        //    //}
-        //    Vector3 newPos = vrCamera.transform.localPosition * -1;
-        //    newPos.y += 1.575f;
-        //    newPos.z += 0.05f;
-        //    camHolder.transform.localPosition = newPos;
-        //    camRoot.transform.position = __instance.transform.position;
-        //    camRoot.transform.rotation = __instance.transform.rotation;
-
-        //}
+        public static VRHandler vrHandlerInstance;
 
 
-        //[HarmonyPostfix]
-        //[HarmonyPatch(typeof(PlayerDetector), "SetEnabled")]
-        //private static void injeedctVR(ViewOptionsMenu __instance) {
-        //    CamFix.inCinematic = true;
-        //    Debug.LogWarning("ENABLED");
-        //}
+
 
         [HarmonyPostfix]
-        [HarmonyPatch(typeof(PlayerDetector), "OnDisable")]
-        private static void wwfd(PlayerController __instance)
+        [HarmonyPatch(typeof(LightZoneColliderUpdater), "Start")]
+        private static void ChangeLighterColour(LightZoneColliderUpdater __instance)
         {
-            Debug.LogWarning("DISABLE");
-
+            __instance.parentLight.color = new Color(1, 0.9355f, 0.6415f, 0.2533f);
         }
+
+        [HarmonyPostfix]
+        [HarmonyPatch(typeof(PlayerWeaponBehaviour), "InitialSetup")]
+        private static void ApplyArmIK(PlayerWeaponBehaviour __instance)
+        {
+            if (__instance.RightHandWeaponPoint.transform.parent.gameObject.GetComponent<VRBody.ArmIK>() == null) { 
+                __instance.RightHandWeaponPoint.transform.parent.gameObject.AddComponent<VRBody.ArmIK>();
+                __instance.LeftHandWeaponPoint.transform.parent.gameObject.AddComponent<VRBody.ArmIK>();
+            }
+        }
+
+
         [HarmonyPostfix]
         [HarmonyPatch(typeof(PlayerDetector), "ForcePlayerExitFromCollider")]
-        private static void wwww(PlayerDetector __instance)
+        private static void EnableCamSwapOnHintInteract(PlayerDetector __instance)
         {
-            Debug.LogWarning("ForcePlayerExitFromCollider");
             CamFix.inCinematic = true;
             headsetPos = CamFix.vrCamera.transform.localPosition;
-            if (__instance.transform.parent.parent.parent.parent.name == "TapeRecorder") {
-                VRHandler.SetMenuPosOnSave();
+            if (__instance.transform.parent.parent.name == "Xray_A_TriggerFlow2_GameObject")
+                CamFix.menus.transform.localPosition = new Vector3(0, 1.275f, 0.65f);
+            else if (__instance.transform.parent.parent.parent.parent.name == "TapeRecorder") {
+                vrHandlerInstance.SetMenuPosOnSave();
             }
 
         }
@@ -93,37 +71,24 @@ namespace TormentedSoulsVR
         [HarmonyPatch(typeof(PlayerController), "OnEnable")]
         private static void ReturnCamViewToPlayerOnEnable(PlayerController __instance)
         {
-            Debug.LogWarning("OnEnable");
             CamFix.inCinematic = false;
             player = __instance;
-            VRHandler.SetMenuPosOnExitSave();
+            if (CamFix.menus != null)
+                vrHandlerInstance.SetMenuPosOnExitSave();
         }
 
         [HarmonyPostfix]
         [HarmonyPatch(typeof(PlayerController), "Awake")]
         private static void ReturnCamViewToPlayerOnAwake(PlayerController __instance)
         {
-            Debug.LogWarning("Awake");
             CamFix.inCinematic = false;
             player = __instance;
         }
-
-
-        //[HarmonyPostfix]
-        //[HarmonyPatch(typeof(PlayerController), "OnDestroy")]
-        //private static void UnsetPlayer(PlayerController __instance)
-        //{
-        //    Debug.LogWarning("OnDestroy");
-        //    player = null;
-        //}
-
 
         [HarmonyPostfix]
         [HarmonyPatch(typeof(PlayerController), "InitializeStates")]
         private static void ReturnCamViewToPlayerOnInit(PlayerController __instance)
         {
-            Debug.LogWarning("InitializeStates");
-
             player = __instance;
         }
 
@@ -131,27 +96,28 @@ namespace TormentedSoulsVR
         [HarmonyPatch(typeof(PlayerController), "SpawnPlayerOnPosition")]
         private static void ReturnCamViewToPlayerOnSpawn(PlayerController __instance)
         {
-            Debug.LogWarning("SpawnPlayerOnPosition");
-
             if (camRoot.transform.childCount >= 2) { 
                 camRoot.transform.GetChild(1).localRotation = Quaternion.identity;
-
             }
             player = __instance;
         }
 
 
+        // Need to manually set the virtual camera positions for a lot of interactable stuff
         [HarmonyPrefix]
         [HarmonyPatch(typeof(ActorEvent_VirtualCamera), "Start")]
         private static void SetVirtualCamPosition(ActorEvent_VirtualCamera __instance)
         {
-            Debug.LogWarning("VCAM START");
             if (__instance.name == "ShelfCamera")
                 __instance.virtualCamera.transform.position = new Vector3(1.918f, 1.6789f, -21.771f);
             else if (__instance.name == "PadlockCameraActor")
                 __instance.virtualCamera.transform.position = new Vector3(2.0541f, 1.6139f, -22.03f);
             else if (__instance.name == "DoorCameraActor")
                 __instance.virtualCamera.transform.position = new Vector3(-0.753f, 0.9859f, -20.391f);
+            else if (__instance.name == "Xray_A_VirtualCamera0_GameObject") { 
+                __instance.virtualCamera.transform.position = new Vector3(-16.106f, 0.884f, 3.093f);
+                __instance.virtualCamera.transform.localRotation = Quaternion.Euler(0f, 194f, 0f);
+            }
             else if (__instance.transform.parent.parent.name == "TapeRecorder" && SceneManager.GetActiveScene().name == "ExamRoom")
             {
                 __instance.virtualCamera.transform.position = new Vector3(-6.4162f, 1.4941f, -0.3169f);
@@ -166,19 +132,21 @@ namespace TormentedSoulsVR
 
         [HarmonyPostfix]
         [HarmonyPatch(typeof(ViewOptionsMenu), "Start")]
-        private static void injeectVR(ViewOptionsMenu __instance)
+        private static void InjectVR(ViewOptionsMenu __instance)
         {
-            //if (!vrStarted && GameDB.instance != null)
             if (!vrStarted && GameDB.instance != null)
             {
+                //layer and volme
                 vrStarted = true;
                 if (camRoot == null)
                 {
-                    VRHandler = GameDB.instance.gameObject.AddComponent<test>();
+                    vrHandlerInstance = GameDB.instance.gameObject.AddComponent<VRHandler>();
                     camRoot = new GameObject("camRoot");
                     camHolder = new GameObject("camHolder");
                     camHolder.transform.parent = camRoot.transform;
                     vrCamera = new GameObject("VRCamera").AddComponent<Camera>();
+                    //vrCamera.CopyFrom(Camera.main);
+                    vrCamera.renderingPath = RenderingPath.DeferredShading;
                     vrCamera.transform.parent = camHolder.transform;
                     vrCamera.nearClipPlane = 0.001f;
                     vrCamera.backgroundColor = Color.black;
@@ -197,6 +165,8 @@ namespace TormentedSoulsVR
                 mainScreenCanvas.transform.localScale = new Vector3(0.002f, 0.002f, 0.002f);
                 mainScreenCanvas.transform.position = new Vector3(0, 1, 4.3f);
                 camHolder.transform.localPosition = vrCamera.transform.localPosition * -1;
+                
+                CameraManager.Setup();
 
             }
         }
@@ -218,53 +188,92 @@ namespace TormentedSoulsVR
         }
 
 
-  
 
 
         [HarmonyPrefix]
-        [HarmonyPatch(typeof(PlayerMovement), "Movement")]
-        private static bool VRMovement(PlayerMovement __instance, Vector2 input, bool dpad = false)
-        {
-            if (!__instance.m_anim.GetCurrentAnimatorStateInfo(0).IsName("Idle") && !__instance.m_anim.GetCurrentAnimatorStateInfo(0).IsName("Movement"))
-                return false;
+        [HarmonyPatch(typeof(PlayerSM_Aim), "ManageInput")]
+        public static bool DisableAimingModeRotation(PlayerSM_Aim __instance, UserInputManager.UserAction action, object payload) {
 
+            if (action == UserInputManager.UserAction.ReloadButton && __instance.m_weaponBase.CanReload())
+                __instance.m_anim.SetTrigger("Reload");
+            if (action == UserInputManager.UserAction.StartRunButton && ((Tuple<bool, bool>)payload).Item2)
+                __instance.m_anim.SetTrigger("Backdash");
+            if (action != UserInputManager.UserAction.ShootButton)
+                return false;
+            if (!__instance.m_playerManager.IsInLightZone())
+            {
+                __instance.m_playerController.triggerShootInShadowsMessage?.Invoke();
+                return false;
+            }
+            __instance.m_anim.SetFloat("WeaponType", __instance.m_weaponBase.GetWeaponAnimatorFloat());
+            if (__instance.m_weaponBase.CanShoot() || __instance.m_weaponBase.weaponType == WeaponType.Crowbar)
+                __instance.m_anim.SetTrigger("Shoot");
+            else if (__instance.m_weaponBase.CanReload())
+                __instance.m_anim.SetTrigger("Reload");
+            else
+                __instance.m_anim.SetTrigger("EmptyShoot");
+            return false;
+        }
+
+        [HarmonyPrefix]
+        [HarmonyPatch(typeof(PlayerSM_LocomotionMachine), "ExitStateManually")]
+        public static bool PreventMovementBlockingOnAim(PlayerSM_LocomotionMachine __instance)
+        {
+            PlayerController playerController = __instance.m_playerController;
+            playerController.OnHitEvent = (Action)Delegate.Remove(playerController.OnHitEvent, new Action(__instance.OnHit));
+            //__instance.m_anim.SetBool("OnLocomotion", value: false);
+            //PlayerController playerController2 = __instance.m_playerController;
+            //playerController2.UserActionEvent = (Action<UserInputManager.UserAction, object>)Delegate.Remove(playerController2.UserActionEvent, new Action<UserInputManager.UserAction, object>(__instance.m_moveBehaviour.ManageInput));
+            //PlayerController playerController3 = __instance.m_playerController;
+            //playerController3.UserActionEvent = (Action<UserInputManager.UserAction, object>)Delegate.Remove(playerController3.UserActionEvent, new Action<UserInputManager.UserAction, object>(__instance.OnUserActionEvent));
+            //__instance.m_moveBehaviour.EnableMovement();
+            return false;
+
+        }
+
+        [HarmonyPrefix]
+        [HarmonyPatch(typeof(PlayerMovement), "Movement")]
+        private static bool SetVRSpeedAndMoveAnim(PlayerMovement __instance, Vector2 input, bool dpad = false)
+        {
+            //if (!__instance.m_anim.GetCurrentAnimatorStateInfo(0).IsName("Idle") && !__instance.m_anim.GetCurrentAnimatorStateInfo(0).IsName("Movement"))
+            //    return false
             Vector2 vector = input;
             // I think these lines set the camera angle based on the position of the player in the cameras arc
-            __instance.oldCameraAngle = __instance.currentCameraAngle;
-            __instance.currentCameraAngle = __instance.m_cameraTransform.eulerAngles.y;
-            float num = Mathf.Abs(__instance.getAngle(Vector2.zero, __instance.inputCache) - __instance.getAngle(Vector2.zero, vector));
-            float num2 = Mathf.Abs(__instance.currentCameraAngle - __instance.oldCameraAngle);
+            //__instance.oldCameraAngle = __instance.currentCameraAngle;
+            //__instance.currentCameraAngle = __instance.m_cameraTransform.eulerAngles.y;
+            //float num = Mathf.Abs(__instance.getAngle(Vector2.zero, __instance.inputCache) - __instance.getAngle(Vector2.zero, vector));
+            //float num2 = Mathf.Abs(__instance.currentCameraAngle - __instance.oldCameraAngle);
             bool animatorParams = false;
-            if (num2 >= __instance.cameraChangeAngleDelta)
-            {
-                if (num >= __instance.stickAngleThreshold || vector == Vector2.zero)
-                {
-                    __instance.inputCache = vector;
-                    __instance.correctionReference = 0f;
-                }
-                else if (num2 > 180f)
-                    __instance.currentCameraAngle = Mathf.SmoothDamp(__instance.convertTo180range(__instance.oldCameraAngle), __instance.convertTo180range(__instance.currentCameraAngle), ref __instance.correctionReference, __instance.correctionTimeAfterCameraChange);
-                else
-                    __instance.currentCameraAngle = Mathf.SmoothDamp(__instance.oldCameraAngle, __instance.currentCameraAngle, ref __instance.correctionReference, __instance.correctionTimeAfterCameraChange);
-            }
-            else
-            {
-                __instance.inputCache = vector;
-            }
-            // If a scene has just started but the current scene isn' set to the current one, do that and lock the joysticks i think?
-            if (__instance.CurrentScene != SceneManager.GetActiveScene().name)
-            {
-                if (!PlayerMovement.ReleasedStick)
-                {
-                    float num3 = (__instance.currentCameraAngle = __instance.transform.rotation.eulerAngles.y - Mathf.Atan2(vector.x, vector.y) * 57.29578f);
-                }
-                else
-                {
-                    __instance.currentCameraAngle = __instance.m_cameraTransform.eulerAngles.y;
-                    PlayerMovement.ReleasedStick = false;
-                }
-                __instance.CurrentScene = SceneManager.GetActiveScene().name;
-            }
+            //if (num2 >= __instance.cameraChangeAngleDelta)
+            //{
+            //    if (num >= __instance.stickAngleThreshold || vector == Vector2.zero)
+            //    {
+            //        __instance.inputCache = vector;
+            //        __instance.correctionReference = 0f;
+            //    }
+            //    else if (num2 > 180f)
+            //        __instance.currentCameraAngle = Mathf.SmoothDamp(__instance.convertTo180range(__instance.oldCameraAngle), __instance.convertTo180range(__instance.currentCameraAngle), ref __instance.correctionReference, __instance.correctionTimeAfterCameraChange);
+            //    else
+            //        __instance.currentCameraAngle = Mathf.SmoothDamp(__instance.oldCameraAngle, __instance.currentCameraAngle, ref __instance.correctionReference, __instance.correctionTimeAfterCameraChange);
+            //}
+            //else
+            //{
+            //    __instance.inputCache = vector;
+            //}
+            //// If a scene has just started but the current scene isn' set to the current one, do that and lock the joysticks i think?
+            //if (__instance.CurrentScene != SceneManager.GetActiveScene().name)
+            //{
+            //    if (!PlayerMovement.ReleasedStick)
+            //    {
+            //        float num3 = (__instance.currentCameraAngle = __instance.transform.rotation.eulerAngles.y - Mathf.Atan2(vector.x, vector.y) * 57.29578f);
+            //    }
+            //    else
+            //    {
+            //        __instance.currentCameraAngle = __instance.m_cameraTransform.eulerAngles.y;
+            //        PlayerMovement.ReleasedStick = false;
+            //    }
+            //    __instance.CurrentScene = SceneManager.GetActiveScene().name;
+            //}
             // I think this if else is for dpad vs joystick movement
             if (dpad)
             {
@@ -344,9 +353,6 @@ namespace TormentedSoulsVR
                 if (vector != Vector2.zero)
                 {
                     // This calculates a rotation angle based on the input X and Y components
-                  
-
-
 
                 }
                 float magnitude = vector.magnitude;
@@ -406,7 +412,7 @@ namespace TormentedSoulsVR
 
         [HarmonyPrefix]
         [HarmonyPatch(typeof(PlayerMovement), "SetRigidbodySpeed")]
-        public static bool AllowHorizontalMovement(PlayerMovement __instance, float targetSpeed)
+        public static bool AllowVRMovement(PlayerMovement __instance, float targetSpeed)
         {
             //__instance.currentSpeed = Mathf.SmoothDamp(__instance.currentSpeed, targetSpeed, ref __instance.speedSmoothVelocity, __instance.speedSmoothTime * Time.deltaTime * 30f);
             ////Vector3 vector = __instance.transform.forward * __instance.currentSpeed;
@@ -443,6 +449,53 @@ namespace TormentedSoulsVR
             
         }
 
+
+        //[HarmonyPrefix]
+        //[HarmonyPatch(typeof(PlayerMovement), "ManageInput")]
+        //public static bool EnableMovementWhenAiming(PlayerMovement __instance, UserInputManager.UserAction action, object payload) {
+        //    if (__instance.FastTurnTrigger && (__instance.MovementEnabled || isAiming))
+        //    {
+        //        __instance.FastTurn();
+        //        return false;
+        //    }
+        //    if (action == UserInputManager.UserAction.LeftAxisMove)
+        //    {
+        //        Vector2 vector = (Vector2)payload;
+        //        __instance.ResetCurrentScene(vector);
+        //        if ((__instance.MovementEnabled || isAiming) && !__instance.GamePaused)
+        //        {
+        //            __instance.Movement(vector);
+        //        }
+        //    }
+        //    if (action == UserInputManager.UserAction.DPADMove)
+        //    {
+        //        Vector2 vector2 = (Vector2)payload;
+        //        __instance.ResetCurrentScene(vector2);
+        //        if ((__instance.MovementEnabled || isAiming) && !__instance.GamePaused && vector2.sqrMagnitude > 0f)
+        //        {
+        //            __instance.Movement(vector2, dpad: true);
+        //        }
+        //    }
+        //    if (action == UserInputManager.UserAction.StartRunButton)
+        //    {
+        //        __instance.m_run = true;
+        //    }
+        //    if (action == UserInputManager.UserAction.StopRunButton)
+        //    {
+        //        __instance.m_run = false;
+        //    }
+        //    switch (action)
+        //    {
+        //        case UserInputManager.UserAction.FastTurn:
+        //            __instance.FastTurnTrigger = true;
+        //            __instance.CurrentActionFrame = 0f;
+        //            break;
+        //        case UserInputManager.UserAction.StartRunButton:
+        //            __instance.CurrentActionFrame = 0f;
+        //            break;
+        //    }
+        //    return false;
+        //}
 
     }
 }

@@ -27,7 +27,7 @@ namespace TormentedSoulsVR.UI
         // Sets up the main menu screen to select the first available button
         [HarmonyPostfix]
         [HarmonyPatch(typeof(InitMenuController), "InitialSetup")]
-        private static void IntialiseMainMenuSelection(InitMenuController __instance)
+        private static void InitMainMenuSelection(InitMenuController __instance)
         {
             currentButton = (NavItemButton)__instance.navItems[0];
             currentButtonBehaviour = currentButton.GetTransform().GetComponent<ItemOptionMenuButtonBehaviour>();
@@ -111,7 +111,7 @@ namespace TormentedSoulsVR.UI
 
         [HarmonyPostfix]
         [HarmonyPatch(typeof(GM_StateOptionsMenu), "Update")]
-        private static void HandleMainMwenuMovement(GM_StateOptionsMenu __instance)
+        private static void HandleInGameMenuMovement(GM_StateOptionsMenu __instance)
         {
             if (__instance.m_panelCurrent.name != "OptionsMenu") 
                 return;
@@ -198,7 +198,7 @@ namespace TormentedSoulsVR.UI
             // Sets up the main menu screen to select the first available button
         [HarmonyPostfix]
         [HarmonyPatch(typeof(OptionsMenuController), "OnEnter")]
-        private static void InitOptionsMenuSelection(OptionsMenuController __instance)
+        private static void SetCurButtonToFirstOfNewMenu(OptionsMenuController __instance)
         {
             currentButtonBehaviour.SelectButton(false);
             currentButton = (NavItemButton)__instance.NavMenuItems[0];
@@ -210,7 +210,7 @@ namespace TormentedSoulsVR.UI
 
         [HarmonyPrefix]
         [HarmonyPatch(typeof(OptionsMenuController), "OnPressedBackOnPanel")]
-        private static bool www(OptionsMenuController __instance, OptionMenuPanelData panel)
+        private static bool ResetCurButtonOnBackPanelPress(OptionsMenuController __instance, OptionMenuPanelData panel)
         {
             if (timeSinceMoved < NEXT_SELECTION_DELAY)
                 return false;
@@ -227,7 +227,7 @@ namespace TormentedSoulsVR.UI
 
         [HarmonyPostfix]
         [HarmonyPatch(typeof(OptionsMenuController), "BackButtonPressed")]
-        private static void wdww(OptionsMenuController __instance)
+        private static void ResetCurButtonOnBack(OptionsMenuController __instance)
         {
             currentButtonBehaviour.SelectButton(false);
             selectedOptionsPanel = null;
@@ -261,7 +261,7 @@ namespace TormentedSoulsVR.UI
 
         [HarmonyPostfix]
         [HarmonyPatch(typeof(SaveScreenView), "OpenNormal")]
-        private static void InitChosenOwwptiddonsMenu(SaveScreenView __instance)
+        private static void SetCurButtonToSave(SaveScreenView __instance)
         {
             currentButtonBehaviour.SelectButton(false) ;
             currentButton = (NavItemButton)__instance.mainMenuNavItems[0];
@@ -272,7 +272,7 @@ namespace TormentedSoulsVR.UI
 
         [HarmonyPostfix]
         [HarmonyPatch(typeof(SaveScreenView), "CloseNormal")]
-        private static void d(SaveScreenView __instance)
+        private static void ResetCurButtonAfterCloseSave(SaveScreenView __instance)
         {
             currentButtonBehaviour.SelectButton(false);
             currentButton = null;

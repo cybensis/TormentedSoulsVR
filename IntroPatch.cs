@@ -41,7 +41,6 @@ namespace TormentedSoulsVR
         [HarmonyPatch(typeof(UnityEngine.Playables.PlayableDirector), "Play", new Type[] { })]
         private static void PositionIntroCinematic(UnityEngine.Playables.PlayableDirector __instance)
         {
-            Debug.LogWarning("bbbbbbbbbbbbbb");
             Canvas cinematicCanvas = __instance.transform.parent.GetChild(1).GetComponent<Canvas>();
             if (cinematicCanvas != null)
             {
@@ -59,51 +58,11 @@ namespace TormentedSoulsVR
 
         [HarmonyPrefix]
         [HarmonyPatch(typeof(UnityEngine.Playables.PlayableDirector), "SendOnPlayableDirectorStop", new Type[] { })]
-        private static void PositionIntroCfdinematic(UnityEngine.Playables.PlayableDirector __instance)
+        private static void ResetVarOnCinematicEnd(UnityEngine.Playables.PlayableDirector __instance)
         {
-
-            Debug.LogWarning("eeeeeeeeeeeeeeee");
             CamFix.inCinematic = false;
-
         }
-        //[HarmonyPrefix]
-        //[HarmonyPatch(typeof(UnityEngine.Playables.PlayableDirector), "ClearReferenceValue")]
-        //private static void PositionIntroffCfdinematic(UnityEngine.Playables.PlayableDirector __instance)
-        //{
 
-        //    Debug.LogWarning("1122222222222222");
-
-        //}
-
-        //[HarmonyPrefix]
-        //[HarmonyPatch(typeof(UnityEngine.Playables.PlayableDirector), "Pause")]
-        //private static void PositionIntroffCfdifnematic(UnityEngine.Playables.PlayableDirector __instance)
-        //{
-
-        //    Debug.LogWarning("3333333333333333333");
-
-        //}
-
-
-        //[HarmonyPrefix]
-        //[HarmonyPatch(typeof(SceneFlowDirector), "UnregisterActor")]
-        //private static void PositionIntroffCfdifnewwmatic(SceneFlowDirector __instance)
-        //{
-
-        //    Debug.LogWarning("4444444444444");
-
-        //}
-
-
-
-        //[HarmonyPrefix]
-        //[HarmonyPatch(typeof(HintableBehaviour), "OnDisable")]
-        //private static void PositionwIntroCfdinematic(HintableBehaviour __instance)
-        //{
-
-        //    Debug.LogWarning("111111111");
-
-        //}
 
 
         [HarmonyPostfix]

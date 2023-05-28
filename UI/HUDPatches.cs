@@ -68,7 +68,7 @@ namespace TormentedSoulsVR.UI
 
         [HarmonyPrefix]
         [HarmonyPatch(typeof(GameplayMenuFakeCursor), "UpdatePosition")]
-        private static bool FixHUDPoswidwtion(GameplayMenuFakeCursor __instance, Vector3 deltaPosition)
+        private static bool FixFakeCursorMovement(GameplayMenuFakeCursor __instance, Vector3 deltaPosition)
         {
             if (__instance.transform.root.name == "MainCanvas")
                 return true;
@@ -83,7 +83,7 @@ namespace TormentedSoulsVR.UI
 
         [HarmonyPrefix]
         [HarmonyPatch(typeof(GameplayMenuFakeCursor), "Update")]
-        private static bool FixHUDPoswidwwtiown(GameplayMenuFakeCursor __instance)
+        private static bool EnableRaycastForFakeCursor(GameplayMenuFakeCursor __instance)
         {
 
             if (!__instance.panelEnabled)
@@ -94,18 +94,17 @@ namespace TormentedSoulsVR.UI
             IFakeClick fakeClick2 = __instance.lastElement;
             if (Physics.Raycast(__instance.transform.position, fwd, out hit, raycastLength) && hit.collider.GetComponent<IFakeClick>() != null) { 
                 fakeClick = hit.collider.GetComponent<IFakeClick>();
-                UnityEngine.Debug.LogWarning(fakeClick);
                 if (__instance.lastElement != null)
                     __instance.lastElement.MouseExit(null);
                 __instance.lastElement = fakeClick;
                 fakeClick.MouseEnter(null);
-                __instance.SetCursorType(GameplayMenuFakeCursor.PointerType.Magnify);
+                //__instance.SetCursorType(GameplayMenuFakeCursor.PointerType.Magnify);
 
 
             }
             else if (__instance.lastElement != null)
             {
-                __instance.SetCursorType(GameplayMenuFakeCursor.PointerType.Normal);
+                //__instance.SetCursorType(GameplayMenuFakeCursor.PointerType.Normal);
                 __instance.lastElement.MouseExit(null);
                 __instance.lastElement = null;
             }
@@ -127,7 +126,7 @@ namespace TormentedSoulsVR.UI
 
         [HarmonyPostfix]
         [HarmonyPatch(typeof(Gui3DObject), "OnItemInReady")]
-        private static void kk(Gui3DObject __instance)
+        private static void ResizeInspectedObject(Gui3DObject __instance)
         {
             GameObject currentObject = __instance.m_currentGo;
             if (currentObject != null && !itemResized )
@@ -175,17 +174,17 @@ namespace TormentedSoulsVR.UI
 
             //__instance.Cursor.transform.localPosition;
             Vector3 newPos = __instance.Cursor.transform.localPosition;
-            newPos.x += SteamVR_Actions._default.LeftJoystick.axis.x * (600 * Time.deltaTime);
-            newPos.y += SteamVR_Actions._default.LeftJoystick.axis.y * (600 * Time.deltaTime);
-            if (SteamVR_Actions._default.LeftJoystick.axis.x != 0 || SteamVR_Actions._default.LeftJoystick.axis.y != 0)
+            newPos.x += SteamVR_Actions._default.RightJoystick.axis.x * (600 * Time.deltaTime);
+            newPos.y += SteamVR_Actions._default.RightJoystick.axis.y * (600 * Time.deltaTime);
+            if (SteamVR_Actions._default.RightJoystick.axis.x != 0 || SteamVR_Actions._default.RightJoystick.axis.y != 0)
             {
                 leftJoyUsedLast = true;
                 __instance.Cursor.UpdatePosition(newPos);
                 __instance.Cursor.MouseOff = false;
             }
             else { 
-                __instance.DPADInput.x = (SteamVR_Actions._default.RightJoystick.axis.x > 0.7) ? 1 : ((SteamVR_Actions._default.RightJoystick.axis.x < -0.7) ? -1 : 0);
-                __instance.DPADInput.y = (SteamVR_Actions._default.RightJoystick.axis.y > 0.7) ? 1 : ((SteamVR_Actions._default.RightJoystick.axis.y < -0.7) ? -1 : 0);
+                __instance.DPADInput.x = (SteamVR_Actions._default.LeftJoystick.axis.x > 0.7) ? 1 : ((SteamVR_Actions._default.LeftJoystick.axis.x < -0.7) ? -1 : 0);
+                __instance.DPADInput.y = (SteamVR_Actions._default.LeftJoystick.axis.y > 0.7) ? 1 : ((SteamVR_Actions._default.LeftJoystick.axis.y < -0.7) ? -1 : 0);
                 bool flag2 = __instance.lastDPADInput != __instance.DPADInput;
                 if (flag2)
                 {

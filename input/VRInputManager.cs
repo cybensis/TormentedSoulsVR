@@ -10,20 +10,11 @@ public static class CameraManager
 
     public static void Setup()
     {
-        if (VROrigin == null)
-        {
-            VROrigin = new GameObject();
-            //VROrigin.transform.Rotate(0f, 270f, 0f, Space.Self);
-        }
-        //VROrigin.transform.parent = Camera.main.transform.parent.parent;
         SpawnHands();
-        if (Camera.main != null)
-        {
-            if (RightHand)
-                RightHand.transform.parent = Camera.main.transform.parent;
-            if (LeftHand)
-                LeftHand.transform.parent = Camera.main.transform.parent;
-        }
+        if (RightHand)
+            RightHand.transform.parent = CamFix.camHolder.transform;
+        if (LeftHand)
+            LeftHand.transform.parent = CamFix.camHolder.transform;
     }
 
     public static void SpawnHands()
@@ -34,7 +25,7 @@ public static class CameraManager
             RightHand = new GameObject("RightHand");
             RightHand.AddComponent<SteamVR_Behaviour_Pose>();
             //RightHand.AddComponent<SteamVR_Skeleton_Poser>();
-            RightHand.transform.parent = VROrigin.transform;
+            RightHand.transform.parent = CamFix.camHolder.transform;
 
         }
         if (!LeftHand)
@@ -42,14 +33,13 @@ public static class CameraManager
             //LeftHand = GameObject.Instantiate(AssetLoader.LeftHandBase, Vector3.zero, Quaternion.identity);
             LeftHand = new GameObject("LeftHand");
             LeftHand.AddComponent<SteamVR_Behaviour_Pose>();
-            LeftHand.transform.parent = VROrigin.transform;
+            LeftHand.transform.parent = CamFix.camHolder.transform;
         }
     }
 
 
 
     // VR Origin and body stuff
-    public static GameObject VROrigin = new GameObject();
     public static GameObject LeftHand = null;
     public static GameObject RightHand = null;
 

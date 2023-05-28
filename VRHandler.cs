@@ -9,7 +9,7 @@ using Valve.VR;
 
 namespace TormentedSoulsVR
 {
-    internal class test : MonoBehaviour
+    internal class VRHandler : MonoBehaviour
     {
        
         private void Awake()
@@ -44,6 +44,10 @@ namespace TormentedSoulsVR
             Controllers.ResetControllerVars();
             Controllers.Init();
 
+
+            SteamVR_Actions._default.RightHandPose.AddOnUpdateListener(SteamVR_Input_Sources.Any, UpdateRightHand);
+            SteamVR_Actions._default.LeftHandPose.AddOnUpdateListener(SteamVR_Input_Sources.Any, UpdateLeftHand);
+
         }
 
         private void Update() {
@@ -77,5 +81,27 @@ namespace TormentedSoulsVR
             CamFix.menus.transform.localRotation = Quaternion.Euler(0, 0, 0);
             CamFix.menus.transform.localPosition = HUDPatches.HUD_POSITION;
         }
+
+
+        private static void UpdateRightHand(SteamVR_Action_Pose fromAction, SteamVR_Input_Sources fromSource)
+        {
+            if (CameraManager.RightHand)
+            {
+                CameraManager.RightHand.transform.localPosition = fromAction.localPosition;
+                CameraManager.RightHand.transform.localRotation = fromAction.localRotation;
+
+            }
+
+        }
+
+        private static void UpdateLeftHand(SteamVR_Action_Pose fromAction, SteamVR_Input_Sources fromSource)
+        {
+            if (CameraManager.LeftHand)
+            {
+                CameraManager.LeftHand.transform.localPosition = fromAction.localPosition;
+                CameraManager.LeftHand.transform.localRotation = fromAction.localRotation;
+            }
+        }
+
     }
 }
