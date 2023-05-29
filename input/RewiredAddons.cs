@@ -125,7 +125,7 @@ namespace TormentedSoulsVR
                 new ActionElementMap(CancelID , ControllerElementType.Button, Controllers.ButtonB, Pole.Positive, AxisRange.Positive, false),
                 new ActionElementMap(AimID , ControllerElementType.Button, Controllers.RightGrip, Pole.Positive, AxisRange.Positive, false),
                 new ActionElementMap(ShootID, ControllerElementType.Button, Controllers.ButtonA , Pole.Positive, AxisRange.Positive, false),
-                new ActionElementMap(RunID, ControllerElementType.Button, Controllers.ButtonX, Pole.Positive, AxisRange.Positive, false), 
+                new ActionElementMap(RunID, ControllerElementType.Button, Controllers.ClickLeftJoystick, Pole.Positive, AxisRange.Positive, false), 
                 new ActionElementMap(MenuID, ControllerElementType.Button, Controllers.ButtonY, Pole.Positive, AxisRange.Positive, false),
                 new ActionElementMap(ShowInputDebugID , ControllerElementType.Button, Controllers.Back, Pole.Positive, AxisRange.Positive, false),
                 new ActionElementMap(ReloadID , ControllerElementType.Button, Controllers.ButtonB, Pole.Positive, AxisRange.Positive, false),

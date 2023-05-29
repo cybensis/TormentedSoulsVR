@@ -34,6 +34,35 @@ namespace TormentedSoulsVR
 
 
 
+        [HarmonyPostfix]
+        [HarmonyPatch(typeof(ActorEvent_OnOffRotator), "Awake")]
+        private static void FixEngineRoomGasPuzzleInteractPositions(ActorEvent_OnOffRotator __instance)
+        {
+            if (__instance.name == "ValvulaD") {
+                Transform electricBoxDoorPanel = __instance.transform.GetChild(1).GetChild(0).GetChild(0).GetChild(0);
+                if (electricBoxDoorPanel.name == "Quad")
+                    electricBoxDoorPanel.position = new Vector3(-1.5491f, 1.6008f, 2.3423f);
+                Transform gasValveTrigger = __instance.transform.GetChild(2).GetChild(0);
+                gasValveTrigger.position = new Vector3(-1.4283f, 1.4635f, 2.6013f);
+            }
+            else if (__instance.name == "ValvulaF")
+            {
+                Transform gasValveTrigger = __instance.transform.GetChild(6).GetChild(0);
+                gasValveTrigger.position = new Vector3(-1.2478f, 1.4773f, 2.5699f);
+            }
+            else if (__instance.name == "Valvula A")
+            {
+                Transform gasValveTrigger = __instance.transform.GetChild(9).GetChild(0);
+                gasValveTrigger.position = new Vector3(-1.032f, 1.7768f, 2.5815f);
+            }
+            else if (__instance.name == "ValvulaE")
+            {
+                Transform gasValveTrigger = __instance.transform.GetChild(6).GetChild(0);
+                gasValveTrigger.position = new Vector3(-1.3469f, 1.4267f, 2.5815f);
+            }
+
+        }
+
 
         [HarmonyPostfix]
         [HarmonyPatch(typeof(LightZoneColliderUpdater), "Start")]
@@ -59,8 +88,9 @@ namespace TormentedSoulsVR
         {
             CamFix.inCinematic = true;
             headsetPos = CamFix.vrCamera.transform.localPosition;
+            CamFix.menus.transform.localPosition = new Vector3(0, 0, 0.3f);
             if (__instance.transform.parent.parent.name == "Xray_A_TriggerFlow2_GameObject")
-                CamFix.menus.transform.localPosition = new Vector3(0, 1.275f, 0.65f);
+                CamFix.menus.transform.localPosition = new Vector3(0,0,0.3f);
             else if (__instance.transform.parent.parent.parent.parent.name == "TapeRecorder") {
                 vrHandlerInstance.SetMenuPosOnSave();
             }
@@ -99,6 +129,7 @@ namespace TormentedSoulsVR
             if (camRoot.transform.childCount >= 2) { 
                 camRoot.transform.GetChild(1).localRotation = Quaternion.identity;
             }
+            camRoot.transform.rotation = __instance.transform.rotation;
             player = __instance;
         }
 
@@ -108,29 +139,71 @@ namespace TormentedSoulsVR
         [HarmonyPatch(typeof(ActorEvent_VirtualCamera), "Start")]
         private static void SetVirtualCamPosition(ActorEvent_VirtualCamera __instance)
         {
-            if (__instance.name == "ShelfCamera")
+            string camName = __instance.name;
+            if (camName == "ShelfCamera") // Shelf at the start of the game
                 __instance.virtualCamera.transform.position = new Vector3(1.918f, 1.6789f, -21.771f);
-            else if (__instance.name == "PadlockCameraActor")
+            else if (camName == "PadlockCameraActor") // Padlock on the shelf at the start of the game
                 __instance.virtualCamera.transform.position = new Vector3(2.0541f, 1.6139f, -22.03f);
-            else if (__instance.name == "DoorCameraActor")
+            else if (camName == "DoorCameraActor") // Door in the starting room you need to use the wrench on
                 __instance.virtualCamera.transform.position = new Vector3(-0.753f, 0.9859f, -20.391f);
-            else if (__instance.name == "Xray_A_VirtualCamera0_GameObject") { 
-                __instance.virtualCamera.transform.position = new Vector3(-16.106f, 0.884f, 3.093f);
+            else if (camName == "Xray_A_VirtualCamera0_GameObject") // The X-ray room save
+            {
+                __instance.virtualCamera.transform.position = new Vector3(-16.006f, 1.084f, 2.493f);
                 __instance.virtualCamera.transform.localRotation = Quaternion.Euler(0f, 194f, 0f);
             }
-            else if (__instance.transform.parent.parent.name == "TapeRecorder" && SceneManager.GetActiveScene().name == "ExamRoom")
+            else if (camName == "MotorPuzzleCamera_GameObject") { // The motor thing in engine room
+                __instance.virtualCamera.transform.position = new Vector3(-5.0709f, 2.2117f, 0.5292f);
+                __instance.virtualCamera.transform.rotation = Quaternion.identity;
+            }
+            else if (camName == "ValvePuzzleNewCamera_GameObject") // The engine room gas box door
             {
-                __instance.virtualCamera.transform.position = new Vector3(-6.4162f, 1.4941f, -0.3169f);
+                __instance.virtualCamera.transform.position = new Vector3(-1.3899f, 1.546f, 1.6511f);
+                __instance.virtualCamera.transform.localRotation = Quaternion.Euler(0,273,0);
+            }
+            else if (camName == "ValvePuzzleCloserCamera_GameObject") // The engine room gas box inside
+            {
+                __instance.virtualCamera.transform.position = new Vector3(-1.1139f, 1.5912f, 2.1472f);
+                __instance.virtualCamera.transform.rotation = Quaternion.Euler(0, 90, 0);
+            }
+            else if (__instance.transform.parent.parent.name == "TapeRecorder" && SceneManager.GetActiveScene().name == "ExamRoom") // The exam room save
+            {
+                __instance.virtualCamera.transform.position = new Vector3(-6.4032f, 1.4941f, -0.5686f);
                 __instance.virtualCamera.transform.localRotation = Quaternion.Euler(0f, 268f, 0f);
             }
-            else if (SceneManager.GetActiveScene().name == "SewingRoom") {
+            else if (SceneManager.GetActiveScene().name == "SewingRoom") // The sewing room save
+            {
                 __instance.virtualCamera.transform.position = new Vector3(-2.7388f, 1.4861f, -1.3017f);
                 __instance.virtualCamera.transform.localRotation = Quaternion.Euler(0f, 354f, 0f);
             }
         }
+//        string camName = __instance.name;
+//            if (camName == "ShelfCamera")
+//                __instance.virtualCamera.transform.position = new Vector3(1.918f, 1.6789f, -21.771f);
+//            else if (camName == "PadlockCameraActor")
+//                __instance.virtualCamera.transform.position = new Vector3(2.0541f, 1.6139f, -22.03f);
+//            else if (camName == "DoorCameraActor")
+//                __instance.virtualCamera.transform.position = new Vector3(-0.753f, 0.9859f, -20.391f);
+//            else if (camName == "Xray_A_VirtualCamera0_GameObject")
+//            {
+//                __instance.virtualCamera.transform.position = new Vector3(-16.106f, 0.884f, 2.693f);
+//        __instance.virtualCamera.transform.localRotation = Quaternion.Euler(0f, 194f, 0f);
+//            }
+//            else if (camName == "MotorPuzzleCamera_GameObject") {
+//                __instance.virtualCamera.transform.position = new Vector3(-5.0709f, 2.2117f, 0.5292f);
+//    __instance.virtualCamera.transform.rotation = Quaternion.identity;
+//            }
+//            else if (__instance.transform.parent.parent.name == "TapeRecorder" && SceneManager.GetActiveScene().name == "ExamRoom")
+//{
+//    __instance.virtualCamera.transform.position = new Vector3(-6.4162f, 1.4941f, -0.3169f);
+//    __instance.virtualCamera.transform.localRotation = Quaternion.Euler(0f, 268f, 0f);
+//}
+//else if (SceneManager.GetActiveScene().name == "SewingRoom")
+//{
+//    __instance.virtualCamera.transform.position = new Vector3(-2.7388f, 1.4861f, -1.3017f);
+//    __instance.virtualCamera.transform.localRotation = Quaternion.Euler(0f, 354f, 0f);
+//}
 
-
-        [HarmonyPostfix]
+[HarmonyPostfix]
         [HarmonyPatch(typeof(ViewOptionsMenu), "Start")]
         private static void InjectVR(ViewOptionsMenu __instance)
         {
@@ -164,7 +237,7 @@ namespace TormentedSoulsVR
                 mainScreenCanvas.renderMode = RenderMode.WorldSpace;
                 mainScreenCanvas.transform.localScale = new Vector3(0.002f, 0.002f, 0.002f);
                 mainScreenCanvas.transform.position = new Vector3(0, 1, 4.3f);
-                camHolder.transform.localPosition = vrCamera.transform.localPosition * -1;
+                camHolder.transform.localPosition = headsetPos * -1;
                 
                 CameraManager.Setup();
 
@@ -238,112 +311,11 @@ namespace TormentedSoulsVR
             //if (!__instance.m_anim.GetCurrentAnimatorStateInfo(0).IsName("Idle") && !__instance.m_anim.GetCurrentAnimatorStateInfo(0).IsName("Movement"))
             //    return false
             Vector2 vector = input;
-            // I think these lines set the camera angle based on the position of the player in the cameras arc
-            //__instance.oldCameraAngle = __instance.currentCameraAngle;
-            //__instance.currentCameraAngle = __instance.m_cameraTransform.eulerAngles.y;
-            //float num = Mathf.Abs(__instance.getAngle(Vector2.zero, __instance.inputCache) - __instance.getAngle(Vector2.zero, vector));
-            //float num2 = Mathf.Abs(__instance.currentCameraAngle - __instance.oldCameraAngle);
             bool animatorParams = false;
-            //if (num2 >= __instance.cameraChangeAngleDelta)
-            //{
-            //    if (num >= __instance.stickAngleThreshold || vector == Vector2.zero)
-            //    {
-            //        __instance.inputCache = vector;
-            //        __instance.correctionReference = 0f;
-            //    }
-            //    else if (num2 > 180f)
-            //        __instance.currentCameraAngle = Mathf.SmoothDamp(__instance.convertTo180range(__instance.oldCameraAngle), __instance.convertTo180range(__instance.currentCameraAngle), ref __instance.correctionReference, __instance.correctionTimeAfterCameraChange);
-            //    else
-            //        __instance.currentCameraAngle = Mathf.SmoothDamp(__instance.oldCameraAngle, __instance.currentCameraAngle, ref __instance.correctionReference, __instance.correctionTimeAfterCameraChange);
-            //}
-            //else
-            //{
-            //    __instance.inputCache = vector;
-            //}
-            //// If a scene has just started but the current scene isn' set to the current one, do that and lock the joysticks i think?
-            //if (__instance.CurrentScene != SceneManager.GetActiveScene().name)
-            //{
-            //    if (!PlayerMovement.ReleasedStick)
-            //    {
-            //        float num3 = (__instance.currentCameraAngle = __instance.transform.rotation.eulerAngles.y - Mathf.Atan2(vector.x, vector.y) * 57.29578f);
-            //    }
-            //    else
-            //    {
-            //        __instance.currentCameraAngle = __instance.m_cameraTransform.eulerAngles.y;
-            //        PlayerMovement.ReleasedStick = false;
-            //    }
-            //    __instance.CurrentScene = SceneManager.GetActiveScene().name;
-            //}
-            // I think this if else is for dpad vs joystick movement
+
             if (dpad)
             {
-                //Debug.LogWarning("DPAD: " + input);
-                // vector is the input, if its not zero then get the new rotation
-                vector = vector.normalized;
-                if (vector != Vector2.zero)
-                {
-                    //float num4 = (float)((input.y == 0f) ? 30 : 20) * vector.x;
-                    //if (Mathf.Abs(vector.x) != 1f && input.x != 0f)
-                    //    num4 = (float)(25 * Math.Sign(vector.x)) * 0.8f;
-
-                    //// Using the calculated rotation angle above, we get the new Y rotation for the player, add it to the existing Y rot value and turn it into a quaternion
-                    //Quaternion b = Quaternion.Euler(0f, num4 + __instance.transform.rotation.eulerAngles.y, 0f);
-                    //// Now slerp between the current rotation and the new one just made
-                    //Quaternion rotation = Quaternion.Slerp(__instance.transform.rotation, b, __instance.turnSmoothTime * Time.deltaTime * 50f);
-                    //// Now we set the players rotation
-                    //__instance.transform.rotation = rotation;
-
-                    //NOTE: All of this rotation stuff can probably be scrapped since we use rightjoystick to rotate
-
-                }
-                // if they aren't moving forwards or backwards make the moving animation idle
-                if (input.y == 0f && input.x == 0f)
-                {
-                    __instance.speed = 0f;
-                    __instance.animationMove = PlayerMovement.AnimationMove.Idle;
-                    animatorParams = true;
-                }
-                // Else if they're moving forward
-                else if (input.y > 0f)
-                {
-                    // If the player is going up or down stairs
-                    if (__instance.stairsTriggers.Count > 0)
-                    {
-                        // Check angle to see if they're going up or down stairs, can probably leave this whole if else code alone
-                        if (Mathf.Abs(__instance.rotationAngle) < 90f)
-                        {
-                            __instance.animationMove = PlayerMovement.AnimationMove.StairsUp;
-                            if (__instance.m_run)
-                                __instance.speed = __instance.m_runSpeedStairsUp;
-                            else
-                                __instance.speed = __instance.m_walkSpeedStairsUp;
-                            
-                        }
-                        else
-                        {
-                            __instance.animationMove = PlayerMovement. AnimationMove.StairsDown;
-                            if (__instance.m_run)
-                                __instance.speed = __instance.m_runSpeedStairsDown;
-                            else
-                                __instance.speed = __instance.m_walkSpeedStairsDown;
-                        }
-                    }
-                    // Else if they aren't going down stairs, then they are going forward so set that animation
-                    else
-                    {
-                        __instance.animationMove = PlayerMovement.AnimationMove.FloorForw;
-                        if (__instance.m_run)
-                            __instance.speed = __instance.m_runSpeed;
-                        else
-                            __instance.speed = __instance.m_walkSpeed;
-                    }   
-                }
-                // If y != 0 and its < 0 then they are moving backwards
-                else
-                {
-                    __instance.animationMove = PlayerMovement.AnimationMove.FloorBack;
-                    __instance.speed = (0f - __instance.m_walkSpeed) / 2f;
-                }
+                return true;
             }
             // Else if joystick is being used
             else
@@ -403,11 +375,36 @@ namespace TormentedSoulsVR
             float rotationSpeed = 100f; 
 
             // Calculate the rotation amount based on the joystick rotation
-            float rotationAmount = SteamVR_Actions._default.RightJoystick.axis.x * rotationSpeed * Time.deltaTime;
+           
+            float rotationAmount = 0;
+            if (__instance.speed != 0)
+            {
+                Vector3 vrRot = CameraManager.LeftHand.transform.eulerAngles;
+                Vector3 bodyRot = __instance.transform.rotation.eulerAngles;
+                // If there is a difference of x between the body and camera rotation
+                if (Mathf.DeltaAngle(vrRot.y, bodyRot.y) > 17.5f)
+                    // for every x degrees of difference in body and camera rotation, rotate the player x * -2f to rotate left or x * 2f to rotate right
+                    rotationAmount = -2f * (Mathf.DeltaAngle(vrRot.y, bodyRot.y) / 17.5f);
+                else if (Mathf.DeltaAngle(vrRot.y, bodyRot.y) < -17.5f)
+                    rotationAmount = 2f * (Mathf.DeltaAngle(vrRot.y, bodyRot.y) / -17.5f);
+                //camRoot.transform.Rotate(0f, rotationAmount * -1, 0f, Space.World);
+            }
+            else 
+                camRoot.transform.rotation = Quaternion.Lerp(camRoot.transform.rotation, __instance.transform.rotation, 8 * Time.deltaTime);
 
+            float joystickRotAmount = SteamVR_Actions._default.RightJoystick.axis.x * rotationSpeed * Time.deltaTime;
+            rotationAmount += joystickRotAmount;
+            camRoot.transform.Rotate(0, joystickRotAmount,0);
             // Apply the rotation to the __instance variable
             __instance.transform.Rotate(0f, rotationAmount, 0f);
+            //if (__instance.speed != 0)
+            //    __instance.transform.rotation = Quaternion.Euler(0, CameraManager.LeftHand.transform.eulerAngles.y, 0);
+            
+            
+            
             return false;
+
+
         }
 
         [HarmonyPrefix]

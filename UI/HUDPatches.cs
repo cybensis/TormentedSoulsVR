@@ -94,6 +94,7 @@ namespace TormentedSoulsVR.UI
             IFakeClick fakeClick2 = __instance.lastElement;
             if (Physics.Raycast(__instance.transform.position, fwd, out hit, raycastLength) && hit.collider.GetComponent<IFakeClick>() != null) { 
                 fakeClick = hit.collider.GetComponent<IFakeClick>();
+                UnityEngine.Debug.LogWarning(fakeClick);
                 if (__instance.lastElement != null)
                     __instance.lastElement.MouseExit(null);
                 __instance.lastElement = fakeClick;
@@ -174,9 +175,15 @@ namespace TormentedSoulsVR.UI
 
             //__instance.Cursor.transform.localPosition;
             Vector3 newPos = __instance.Cursor.transform.localPosition;
-            newPos.x += SteamVR_Actions._default.RightJoystick.axis.x * (600 * Time.deltaTime);
-            newPos.y += SteamVR_Actions._default.RightJoystick.axis.y * (600 * Time.deltaTime);
-            if (SteamVR_Actions._default.RightJoystick.axis.x != 0 || SteamVR_Actions._default.RightJoystick.axis.y != 0)
+            float xAxis = SteamVR_Actions._default.RightJoystick.axis.x;
+            float yAxis = SteamVR_Actions._default.RightJoystick.axis.y;
+            if (__instance.isExaminateItemPanelOpen) {
+                xAxis = SteamVR_Actions._default.LeftJoystick.axis.x;
+                yAxis = SteamVR_Actions._default.LeftJoystick.axis.y;
+            }
+            newPos.x += xAxis * (600 * Time.deltaTime);
+            newPos.y += yAxis * (600 * Time.deltaTime);
+            if (xAxis != 0 || yAxis != 0)
             {
                 leftJoyUsedLast = true;
                 __instance.Cursor.UpdatePosition(newPos);
