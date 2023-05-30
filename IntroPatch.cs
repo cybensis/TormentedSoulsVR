@@ -31,7 +31,8 @@ namespace TormentedSoulsVR
             }
 
             CamFix.vrCamera.backgroundColor = new Color(0.1284f, 0.1792f, 0.1333f, 1);
-            CamFix.camHolder.transform.localPosition = new Vector3(0, 0, 0.1f);
+            CamFix.camHolder.transform.localPosition = CamFix.vrCamera.transform.position * -1;
+            CamFix.menus.transform.localPosition = new Vector3(0,0,0.3f);
 
         }
 
@@ -46,7 +47,7 @@ namespace TormentedSoulsVR
             {
                 cinematicCanvas.renderMode = RenderMode.WorldSpace;
                 cinematicCanvas.transform.localScale = new Vector3(0.001f, 0.001f, 0.001f);
-                cinematicCanvas.transform.position = new Vector3(0f, 1.5f, 2.1f);
+                cinematicCanvas.transform.position = new Vector3(0f, 0f, 2.1f);
             }
             else { 
                 CamFix.inCinematic = true;

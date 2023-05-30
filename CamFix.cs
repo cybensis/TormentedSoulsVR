@@ -63,6 +63,35 @@ namespace TormentedSoulsVR
 
         }
 
+        [HarmonyPostfix]
+        [HarmonyPatch(typeof(ActorEvent_FakeCursorRaycastReceiver), "Start")]
+        private static void RepositionMirrorCandleInteractions(ActorEvent_OnOffRotator __instance) {
+            if (__instance.name == "CandleRightClickReceiver_GameObject") // The right candle for the mirror
+                __instance.transform.position = new Vector3(3.8332f, -0.892f, -3.405f);
+            else if (__instance.name == "CandleLeftClickReceiver_GameObject") // The left candle for the mirror
+                __instance.transform.position = new Vector3(3.8841f, -0.892f, -2.9076f);
+            else if (__instance.name == "BabyDoll_ChestReceiver") // The babys heart in the mirror world
+                __instance.transform.position = new Vector3(1.981f, 1.352f, -5.504f);
+            else if (__instance.name == "ElectricGiverSwitchCollider") // The babys heart in the mirror world
+                __instance.transform.position = new Vector3(2.0536f, 1.2608f, -6.093f);
+            else if (__instance.name == "ElectricLeverClickReceiver") { 
+                __instance.transform.position = new Vector3(2.0126f, 1.1932f, -6.008f);
+                __instance.transform.parent.localRotation = Quaternion.identity;
+            }
+        }
+
+
+        [HarmonyPostfix]
+        [HarmonyPatch(typeof(HintableBehaviour), "Awake")]
+        private static void FixBandageRemovalCam(HintableBehaviour __instance)
+        {
+            if (__instance.transform.parent.name != "Cinematic1_CameraChanges")
+                return;
+
+            Transform camToMove = __instance.transform.parent.GetChild(4).GetChild(3);
+            camToMove.position = new Vector3(-2.291f, 1.8268f, -26.4342f);
+        }
+
 
         [HarmonyPostfix]
         [HarmonyPatch(typeof(LightZoneColliderUpdater), "Start")]
@@ -131,7 +160,30 @@ namespace TormentedSoulsVR
             }
             camRoot.transform.rotation = __instance.transform.rotation;
             player = __instance;
+            AudioListener OGCamAudio = Camera.main.GetComponent<AudioListener>();
+            if (OGCamAudio != null)
+                OGCamAudio.enabled = false;
+            __instance.gameObject.AddComponent<AudioListener>();
         }
+
+
+        [HarmonyPostfix]
+        [HarmonyPatch(typeof(ItemOptionMenuButtonBehaviour), "Start")]
+        private static void SetDeathScreenCanvas(ItemOptionMenuButtonBehaviour __instance)
+        {
+            if (__instance.name != "MenuButton (1)" && __instance.transform.root.name != "Canvas")
+                return;
+
+            Transform deathScreen = __instance.transform.root;
+            deathScreen.GetComponent<Canvas>().renderMode = RenderMode.WorldSpace;
+            deathScreen.localScale = new Vector3(0.006f, 0.006f, 0.006f);
+            deathScreen.position = new Vector3(0,1,6);
+            deathScreen.rotation = Quaternion.identity;
+
+            CamFix.camRoot.transform.position = Vector3.zero;
+            CamFix.camRoot.transform.rotation = Quaternion.identity;
+        }
+
 
 
         // Need to manually set the virtual camera positions for a lot of interactable stuff
@@ -143,7 +195,7 @@ namespace TormentedSoulsVR
             if (camName == "ShelfCamera") // Shelf at the start of the game
                 __instance.virtualCamera.transform.position = new Vector3(1.918f, 1.6789f, -21.771f);
             else if (camName == "PadlockCameraActor") // Padlock on the shelf at the start of the game
-                __instance.virtualCamera.transform.position = new Vector3(2.0541f, 1.6139f, -22.03f);
+                __instance.virtualCamera.transform.position = new Vector3(2.1541f, 1.6139f, -22.03f);
             else if (camName == "DoorCameraActor") // Door in the starting room you need to use the wrench on
                 __instance.virtualCamera.transform.position = new Vector3(-0.753f, 0.9859f, -20.391f);
             else if (camName == "Xray_A_VirtualCamera0_GameObject") // The X-ray room save
@@ -151,19 +203,51 @@ namespace TormentedSoulsVR
                 __instance.virtualCamera.transform.position = new Vector3(-16.006f, 1.084f, 2.493f);
                 __instance.virtualCamera.transform.localRotation = Quaternion.Euler(0f, 194f, 0f);
             }
-            else if (camName == "MotorPuzzleCamera_GameObject") { // The motor thing in engine room
+            else if (camName == "MotorPuzzleCamera_GameObject")
+            { // The motor thing in engine room
                 __instance.virtualCamera.transform.position = new Vector3(-5.0709f, 2.2117f, 0.5292f);
                 __instance.virtualCamera.transform.rotation = Quaternion.identity;
             }
             else if (camName == "ValvePuzzleNewCamera_GameObject") // The engine room gas box door
             {
                 __instance.virtualCamera.transform.position = new Vector3(-1.3899f, 1.546f, 1.6511f);
-                __instance.virtualCamera.transform.localRotation = Quaternion.Euler(0,273,0);
+                __instance.virtualCamera.transform.localRotation = Quaternion.Euler(0, 273, 0);
             }
             else if (camName == "ValvePuzzleCloserCamera_GameObject") // The engine room gas box inside
             {
                 __instance.virtualCamera.transform.position = new Vector3(-1.1139f, 1.5912f, 2.1472f);
                 __instance.virtualCamera.transform.rotation = Quaternion.Euler(0, 90, 0);
+            }
+            else if (camName == "MirrorCamera_GameObject") // The maternity ward underground mirror
+                __instance.virtualCamera.transform.position = new Vector3(3.1799f, -0.448f, -3.2055f);
+            else if (camName == "BabyDoll_Camera") // The mirror world baby
+                __instance.virtualCamera.transform.position = new Vector3(1.8144f, 1.47f, -6.0777f);
+            else if (camName == "HandCamera") // The woman in the maternity ward
+            {
+                __instance.virtualCamera.transform.position = new Vector3(1.5594f, 1.3408f, -6.218f);
+                __instance.virtualCamera.transform.localRotation = Quaternion.Euler(0, 243, 0);
+            }
+            else if (camName == "DoorPuzzleCamera") // Waiting room door
+            {
+                __instance.virtualCamera.transform.position = new Vector3(-3.0185f, 1.1519f, 0.4228f);
+                __instance.virtualCamera.transform.parent.GetChild(1).position = new Vector3(-3.0752f, 1.0959f, 0.2848f);
+            }
+            else if (camName == "FridgeCamera") // Fridge in the kitchen
+            {
+                __instance.virtualCamera.transform.position = new Vector3(-0.4357f, 1.7708f, -2.708f);
+                __instance.virtualCamera.transform.localRotation = Quaternion.Euler(0f, 192f, 0f);
+            }
+            else if (camName == "HeartBeatPuzzleCamera_GameObject") // Fridge in the kitchen
+                __instance.virtualCamera.transform.position = new Vector3(-2.488f, 4.612f, 20.489f);
+            else if (camName == "Corridor2dHeartBeatPuzzleCamera_GameObject") // The door with the knocking puzzle
+            {
+                __instance.virtualCamera.transform.position = new Vector3(-6.031f, 1.313f, 5.683f);
+                __instance.virtualCamera.transform.parent.GetChild(1).position = new Vector3(1.502f, 1.186f, 6.1762f);
+            }
+            else if (camName == "HydraulicTable") // Library hydraulic lift puzzle
+            {
+                __instance.virtualCamera.transform.position = new Vector3(-14.896f, 1.673f, -3.2214f);
+                __instance.virtualCamera.transform.parent.GetChild(1).position = new Vector3(-14.509f, 1.558f, -3.2696f);
             }
             else if (__instance.transform.parent.parent.name == "TapeRecorder" && SceneManager.GetActiveScene().name == "ExamRoom") // The exam room save
             {
@@ -172,7 +256,7 @@ namespace TormentedSoulsVR
             }
             else if (SceneManager.GetActiveScene().name == "SewingRoom") // The sewing room save
             {
-                __instance.virtualCamera.transform.position = new Vector3(-2.7388f, 1.4861f, -1.3017f);
+                __instance.virtualCamera.transform.position = new Vector3(-2.6576f, 1.4861f, -1.5905f);
                 __instance.virtualCamera.transform.localRotation = Quaternion.Euler(0f, 354f, 0f);
             }
         }
@@ -203,7 +287,7 @@ namespace TormentedSoulsVR
 //    __instance.virtualCamera.transform.localRotation = Quaternion.Euler(0f, 354f, 0f);
 //}
 
-[HarmonyPostfix]
+        [HarmonyPostfix]
         [HarmonyPatch(typeof(ViewOptionsMenu), "Start")]
         private static void InjectVR(ViewOptionsMenu __instance)
         {
@@ -222,6 +306,7 @@ namespace TormentedSoulsVR
                     vrCamera.renderingPath = RenderingPath.DeferredShading;
                     vrCamera.transform.parent = camHolder.transform;
                     vrCamera.nearClipPlane = 0.001f;
+                    vrCamera.clearFlags = CameraClearFlags.SolidColor;
                     vrCamera.backgroundColor = Color.black;
                     vrCamera.gameObject.AddComponent<SteamVR_TrackedObject>();
                     UnityEngine.Object.DontDestroyOnLoad(camRoot);

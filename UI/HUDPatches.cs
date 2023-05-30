@@ -10,6 +10,7 @@ using UnityEngine.EventSystems;
 using TS.Gameplay.Menu;
 using System.Diagnostics;
 using TS.Items;
+using UnityEngine.SceneManagement;
 
 namespace TormentedSoulsVR.UI
 {
@@ -17,6 +18,7 @@ namespace TormentedSoulsVR.UI
     internal class HUDPatches
     {
         private const int NUM_OF_3D_OBJ_CHILDREN = 6;
+
 
         private static float raycastLength = 5;
         public static Canvas hudCanvas;
@@ -31,10 +33,15 @@ namespace TormentedSoulsVR.UI
         private static void FixHUDPosition(GameplayMenuManager __instance) { 
             if (CamFix.camRoot != null)
             {
+
                 __instance.transform.parent = CamFix.camRoot.transform;
                 CamFix.menus = __instance;
                 __instance.transform.localScale = new Vector3(0.0003f, 0.0003f, 0.0003f);
-                __instance.transform.localPosition = HUD_POSITION;
+                // In the intro the HUD needs to be at a lower pos
+                if (SceneManager.GetActiveScene().name == "IntroScene")
+                    __instance.transform.localPosition = new Vector3(0,0,0.3f);
+                else
+                    __instance.transform.localPosition = HUD_POSITION;
                 __instance.transform.localRotation = Quaternion.identity;
                 __instance.transform.rotation = Quaternion.identity;
                 hudCanvas = __instance.m_normalMenuView.m_generalCanvas.GetComponent<Canvas>();
@@ -86,7 +93,7 @@ namespace TormentedSoulsVR.UI
         private static bool EnableRaycastForFakeCursor(GameplayMenuFakeCursor __instance)
         {
 
-            if (!__instance.panelEnabled)
+            if (!__instance.panelEnabled && !leftJoyUsedLast)
                 return false;
             Vector3 fwd = __instance.transform.TransformDirection(Vector3.forward);
             RaycastHit hit;
@@ -94,7 +101,6 @@ namespace TormentedSoulsVR.UI
             IFakeClick fakeClick2 = __instance.lastElement;
             if (Physics.Raycast(__instance.transform.position, fwd, out hit, raycastLength) && hit.collider.GetComponent<IFakeClick>() != null) { 
                 fakeClick = hit.collider.GetComponent<IFakeClick>();
-                UnityEngine.Debug.LogWarning(fakeClick);
                 if (__instance.lastElement != null)
                     __instance.lastElement.MouseExit(null);
                 __instance.lastElement = fakeClick;

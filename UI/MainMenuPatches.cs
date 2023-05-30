@@ -24,6 +24,24 @@ namespace TormentedSoulsVR.UI
         private static OptionMenuButtonBaseBehaviour currentOptionsButton;
         private static int currentOptionsIndex = 0;
 
+
+        // After dying it changes the main menu canvas so it needs to be patched
+        [HarmonyPostfix]
+        [HarmonyPatch(typeof(ViewOptionsMenu), "Start")]
+        private static void FixMainMenuOnReturn(ViewOptionsMenu __instance)
+        {
+            if (__instance.transform.root.name != "MainCanvas")
+                return;
+
+            Transform mainMenu = __instance.transform.root;
+            mainMenu.GetComponent<Canvas>().renderMode = RenderMode.WorldSpace;
+            mainMenu.localScale = new Vector3(0.006f, 0.006f, 0.006f);
+            mainMenu.position = new Vector3(0, 0, 11.1055f);
+
+            if (CamFix.camRoot.transform.childCount >= 2)
+                UnityEngine.Object.Destroy(CamFix.camRoot.transform.GetChild(1).gameObject);
+        }
+
         // Sets up the main menu screen to select the first available button
         [HarmonyPostfix]
         [HarmonyPatch(typeof(InitMenuController), "InitialSetup")]
@@ -195,7 +213,7 @@ namespace TormentedSoulsVR.UI
 
 
 
-            // Sets up the main menu screen to select the first available button
+        // Sets up the main menu screen to select the first available button
         [HarmonyPostfix]
         [HarmonyPatch(typeof(OptionsMenuController), "OnEnter")]
         private static void SetCurButtonToFirstOfNewMenu(OptionsMenuController __instance)
