@@ -195,100 +195,106 @@ namespace TormentedSoulsVR
         private static void SetVirtualCamPosition(ActorEvent_VirtualCamera __instance)
         {
             string camName = __instance.name;
-            if (camName == "ShelfCamera") // Shelf at the start of the game
+            if (camName == "ShelfCamera")                                                                                           // Shelf at the start of the game
                 __instance.virtualCamera.transform.position = new Vector3(1.918f, 1.6789f, -21.771f);
-            else if (camName == "PadlockCameraActor") // Padlock on the shelf at the start of the game
+            else if (camName == "PadlockCameraActor")                                                                               // Padlock on the shelf at the start of the game
                 __instance.virtualCamera.transform.position = new Vector3(2.1541f, 1.6139f, -22.03f);
-            else if (camName == "DoorCameraActor") // Door in the starting room you need to use the wrench on
+            else if (camName == "DoorCameraActor")                                                                                  // Door in the starting room you need to use the wrench on
                 __instance.virtualCamera.transform.position = new Vector3(-0.753f, 0.9859f, -20.391f);
-            else if (camName == "Xray_A_VirtualCamera0_GameObject") // The X-ray room save
+            else if (camName == "Xray_A_VirtualCamera0_GameObject")                                                                 // The X-ray room save
             {
                 __instance.virtualCamera.transform.position = new Vector3(-16.006f, 1.084f, 2.493f);
                 __instance.virtualCamera.transform.localRotation = Quaternion.Euler(0f, 194f, 0f);
             }
-            else if (camName == "MotorPuzzleCamera_GameObject")
-            { // The motor thing in engine room
+            else if (camName == "MotorPuzzleCamera_GameObject")                                                                     // The motor thing in engine room
+            { 
                 __instance.virtualCamera.transform.position = new Vector3(-5.0709f, 2.2117f, 0.5292f);
                 __instance.virtualCamera.transform.rotation = Quaternion.identity;
             }
-            else if (camName == "ValvePuzzleNewCamera_GameObject") // The engine room gas box door
+            else if (camName == "ValvePuzzleNewCamera_GameObject")                                                                  // The engine room gas box door
             {
                 __instance.virtualCamera.transform.position = new Vector3(-1.3899f, 1.546f, 1.6511f);
                 __instance.virtualCamera.transform.localRotation = Quaternion.Euler(0, 273, 0);
             }
-            else if (camName == "ValvePuzzleCloserCamera_GameObject") // The engine room gas box inside
+            else if (camName == "ValvePuzzleCloserCamera_GameObject")                                                               // The engine room gas box inside
             {
                 __instance.virtualCamera.transform.position = new Vector3(-1.1139f, 1.5912f, 2.1472f);
                 __instance.virtualCamera.transform.rotation = Quaternion.Euler(0, 90, 0);
             }
-            else if (camName == "MirrorCamera_GameObject") // The maternity ward underground mirror
+            else if (camName == "MirrorCamera_GameObject")                                                                          // The maternity ward underground mirror
                 __instance.virtualCamera.transform.position = new Vector3(3.1799f, -0.448f, -3.2055f);
-            else if (camName == "BabyDoll_Camera") // The mirror world baby
+            else if (camName == "BabyDoll_Camera")                                                                                  // The mirror world baby
                 __instance.virtualCamera.transform.position = new Vector3(1.8144f, 1.47f, -6.0777f);
-            else if (camName == "HandCamera") // The woman in the maternity ward
+            else if (camName == "HandCamera")                                                                                       // The woman in the maternity ward
             {
                 __instance.virtualCamera.transform.position = new Vector3(1.5594f, 1.3408f, -6.218f);
                 __instance.virtualCamera.transform.localRotation = Quaternion.Euler(0, 243, 0);
             }
-            else if (camName == "DoorPuzzleCamera") // Waiting room door
+            else if (camName == "DoorPuzzleCamera")                                                                                 // Waiting room door
             {
                 __instance.virtualCamera.transform.position = new Vector3(-3.0185f, 1.1519f, 0.4228f);
                 __instance.virtualCamera.transform.parent.GetChild(1).position = new Vector3(-3.0752f, 1.0959f, 0.2848f);
             }
-            else if (camName == "FridgeCamera") // Fridge in the kitchen
+            else if (camName == "FridgeCamera")                                                                                     // Fridge in the kitchen
             {
                 __instance.virtualCamera.transform.position = new Vector3(-0.4357f, 1.7708f, -2.708f);
                 __instance.virtualCamera.transform.localRotation = Quaternion.Euler(0f, 192f, 0f);
             }
             else if (camName == "HeartBeatPuzzleCamera_GameObject") // Fridge in the kitchen
                 __instance.virtualCamera.transform.position = new Vector3(-2.488f, 4.612f, 20.489f);
-            else if (camName == "Corridor2dHeartBeatPuzzleCamera_GameObject") // The door with the knocking puzzle
+            else if (camName == "Corridor2dHeartBeatPuzzleCamera_GameObject")                                                       // The door with the knocking puzzle
             {
                 __instance.virtualCamera.transform.position = new Vector3(-6.031f, 1.313f, 5.683f);
                 __instance.virtualCamera.transform.parent.GetChild(1).position = new Vector3(1.502f, 1.186f, 6.1762f);
             }
-            else if (camName == "HydraulicTable") // Library hydraulic lift puzzle
+            else if (camName == "HydraulicTable")                                                                                   // Library hydraulic lift puzzle
             {
                 __instance.virtualCamera.transform.position = new Vector3(-14.896f, 1.673f, -3.2214f);
                 __instance.virtualCamera.transform.parent.GetChild(1).position = new Vector3(-14.509f, 1.558f, -3.2696f);
+            }
+            else if (camName == "FuseboxReception_Camera_GameObject" && SceneManager.GetActiveScene().name == "Corridor_2A")        // Reception area fuse box
+            {
+                __instance.virtualCamera.transform.position = new Vector3(-6.282f, 1.7057f, - 7.1045f);
+                __instance.virtualCamera.transform.localRotation = Quaternion.Euler(0f, 289f, 0f);
+            }
+            else if (camName == "FuseboxReception_Camera_GameObject")                                                               // Reception area fuse box
+            {
+                __instance.virtualCamera.transform.position = new Vector3(2.873f, 2.121f, 1.834f);
+                __instance.virtualCamera.transform.parent.GetChild(1).position = new Vector3(2.578f, 1.978f, 1.28f);
+            }
+            else if (camName == "BA_ElevatorVirtualCamera_GameObject" && SceneManager.GetActiveScene().name == "Corridor_1B")       // Elevator panel bottom floor
+            {
+                __instance.virtualCamera.transform.position = new Vector3(-9.2681f, 2.2473f, 2.465f);
+                __instance.virtualCamera.transform.localRotation = Quaternion.Euler(0f, 102f, 0f);
+            }
+            else if (camName == "BA_ElevatorVirtualCamera_GameObject" && SceneManager.GetActiveScene().name == "Corridor_2A")       // Elevator panel
+            {
+                __instance.virtualCamera.transform.position = new Vector3(-10.84f, 1.2232f, -6.9491f);
+                __instance.virtualCamera.transform.localRotation = Quaternion.Euler(0f, 102f, 0f);
             }
             else if (__instance.transform.parent.parent.name == "TapeRecorder" && SceneManager.GetActiveScene().name == "ExamRoom") // The exam room save
             {
                 __instance.virtualCamera.transform.position = new Vector3(-6.4032f, 1.4941f, -0.5686f);
                 __instance.virtualCamera.transform.localRotation = Quaternion.Euler(0f, 268f, 0f);
             }
-            else if (SceneManager.GetActiveScene().name == "SewingRoom") // The sewing room save
+            else if (SceneManager.GetActiveScene().name == "SewingRoom")                                                            // The sewing room save
             {
                 __instance.virtualCamera.transform.position = new Vector3(-2.6576f, 1.4861f, -1.5905f);
                 __instance.virtualCamera.transform.localRotation = Quaternion.Euler(0f, 354f, 0f);
             }
+            else if (SceneManager.GetActiveScene().name == "Bathroom_C")                                                            // Definitely not a bathroom, more like a small office
+            {
+                __instance.virtualCamera.transform.position = new Vector3(3.0959f, 1.6061f, -0.5924f);
+                __instance.virtualCamera.transform.localRotation = Quaternion.Euler(0f, 86f, 0f);
+            }
+            else if (SceneManager.GetActiveScene().name == "Room_2E")                                                               // Upstairs break room save
+            {
+                __instance.virtualCamera.transform.position = new Vector3(-3.3754f, 1.0501f, -0.405f);
+                __instance.virtualCamera.transform.parent.GetChild(1).position = new Vector3(-3.8732f, 0.7211f, 2.8718f);
+            }
         }
-//        string camName = __instance.name;
-//            if (camName == "ShelfCamera")
-//                __instance.virtualCamera.transform.position = new Vector3(1.918f, 1.6789f, -21.771f);
-//            else if (camName == "PadlockCameraActor")
-//                __instance.virtualCamera.transform.position = new Vector3(2.0541f, 1.6139f, -22.03f);
-//            else if (camName == "DoorCameraActor")
-//                __instance.virtualCamera.transform.position = new Vector3(-0.753f, 0.9859f, -20.391f);
-//            else if (camName == "Xray_A_VirtualCamera0_GameObject")
-//            {
-//                __instance.virtualCamera.transform.position = new Vector3(-16.106f, 0.884f, 2.693f);
-//        __instance.virtualCamera.transform.localRotation = Quaternion.Euler(0f, 194f, 0f);
-//            }
-//            else if (camName == "MotorPuzzleCamera_GameObject") {
-//                __instance.virtualCamera.transform.position = new Vector3(-5.0709f, 2.2117f, 0.5292f);
-//    __instance.virtualCamera.transform.rotation = Quaternion.identity;
-//            }
-//            else if (__instance.transform.parent.parent.name == "TapeRecorder" && SceneManager.GetActiveScene().name == "ExamRoom")
-//{
-//    __instance.virtualCamera.transform.position = new Vector3(-6.4162f, 1.4941f, -0.3169f);
-//    __instance.virtualCamera.transform.localRotation = Quaternion.Euler(0f, 268f, 0f);
-//}
-//else if (SceneManager.GetActiveScene().name == "SewingRoom")
-//{
-//    __instance.virtualCamera.transform.position = new Vector3(-2.7388f, 1.4861f, -1.3017f);
-//    __instance.virtualCamera.transform.localRotation = Quaternion.Euler(0f, 354f, 0f);
-//}
+
+
 
         [HarmonyPostfix]
         [HarmonyPatch(typeof(ViewOptionsMenu), "Start")]
@@ -459,11 +465,11 @@ namespace TormentedSoulsVR
             __instance.SetRigidbodySpeed(num6);
             __instance.SetAnimatorParams(animatorParams);
             __instance.SetIsMakingSound(__instance.IsRunning(num6));
-            //Vector3 movementVector = new Vector3(vector.x, 0f, vector.y);
-            //movementVector.Normalize();
+
+
+
             float rotationSpeed = 100f; 
 
-            // Calculate the rotation amount based on the joystick rotation
            
             float rotationAmount = 0;
             if (__instance.speed != 0)
@@ -478,9 +484,10 @@ namespace TormentedSoulsVR
                     rotationAmount = 2f * (Mathf.DeltaAngle(vrRot.y, bodyRot.y) / -17.5f);
                 //camRoot.transform.Rotate(0f, rotationAmount * -1, 0f, Space.World);
             }
-            else 
+            else if (Mathf.Abs(camRoot.transform.eulerAngles.y - __instance.transform.rotation.eulerAngles.y) > 45 )
                 camRoot.transform.rotation = Quaternion.Lerp(camRoot.transform.rotation, __instance.transform.rotation, 8 * Time.deltaTime);
 
+            // Calculate the rotation amount based on the joystick rotation
             float joystickRotAmount = SteamVR_Actions._default.RightJoystick.axis.x * rotationSpeed * Time.deltaTime;
             rotationAmount += joystickRotAmount;
             camRoot.transform.Rotate(0, joystickRotAmount,0);
@@ -508,8 +515,33 @@ namespace TormentedSoulsVR
             __instance.currentSpeed = Mathf.SmoothDamp(__instance.currentSpeed, targetSpeed, ref __instance.speedSmoothVelocity, __instance.speedSmoothTime * Time.deltaTime * 30f);
 
             Vector3 input = new Vector3(SteamVR_Actions._default.LeftJoystick.axis.x, 0f, SteamVR_Actions._default.LeftJoystick.axis.y); // Get input for both horizontal and vertical axes
+            
+            // This gets the difference between the player body and the camera
+            Vector3 camDistanceFromBody = __instance.transform.InverseTransformPoint(vrCamera.transform.position);
+            // If the users x and y hmd axis is further away than 0.5 something must be wrong, so limit it to -+0.5
+            camDistanceFromBody.x = Mathf.Clamp(camDistanceFromBody.x, -0.5f, 0.5f);
+            camDistanceFromBody.z = Mathf.Clamp(camDistanceFromBody.z, -0.5f, 0.5f);
 
+
+            // If the camera is beyond -+0.1 distance from the body, then move it in that direction
+            if (camDistanceFromBody.x >= 0.1f || camDistanceFromBody.x <= -0.1f)
+            {
+                input.x += camDistanceFromBody.x * 2f;
+                // Since the cam holder is a child of the player body, we need to offset the movement with this
+                headsetPos.x += ((camDistanceFromBody.x / 1.5f) * Time.deltaTime);
+                __instance.currentSpeed += 0.5f;
+            }
+            if (camDistanceFromBody.z > 0.1f || camDistanceFromBody.z <= -0.05f)
+            {
+                input.z += camDistanceFromBody.z * 2f;
+                headsetPos.z += ((camDistanceFromBody.z / 1.5f) * Time.deltaTime);
+                __instance.currentSpeed += 0.5f;
+                if (camDistanceFromBody.z < -0.1f)
+                    __instance.currentSpeed += 0.5f;
+
+            }
             Vector3 movement = __instance.transform.right * input.x + __instance.transform.forward * input.z; // Calculate movement vector
+
 
             __instance.m_rigidbody.velocity = new Vector3(movement.x * __instance.currentSpeed, __instance.m_rigidbody.velocity.y, movement.z * __instance.currentSpeed);
             if ((double)__instance.m_rigidbody.velocity.sqrMagnitude < 0.01)
