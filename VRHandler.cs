@@ -107,6 +107,7 @@ namespace TormentedSoulsVR
         public static void SetHeight(SteamVR_Action_Boolean fromAction, SteamVR_Input_Sources fromSource)
         {
             CamFix.headsetPos = CamFix.vrCamera.transform.localPosition;
+            CamFix.crouchInstance.InitHeight();
         }
     }
 }

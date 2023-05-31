@@ -1,5 +1,6 @@
 ﻿using HarmonyLib;
 using System;
+using TormentedSoulsVR.VRBody;
 using Unity.Rendering;
 using UnityEngine;
 using UnityEngine.Rendering.PostProcessing;
@@ -17,6 +18,8 @@ namespace TormentedSoulsVR
         public static Camera vrCamera;
         public static GameObject camRoot;
         public static GameplayMenuManager menus;
+
+        public static VRCrouch crouchInstance;
 
         public static PlayerController player;
 
@@ -163,7 +166,7 @@ namespace TormentedSoulsVR
             AudioListener OGCamAudio = Camera.main.GetComponent<AudioListener>();
             if (OGCamAudio != null)
                 OGCamAudio.enabled = false;
-            __instance.gameObject.AddComponent<AudioListener>();
+
         }
 
 
@@ -311,6 +314,7 @@ namespace TormentedSoulsVR
                     vrCamera.gameObject.AddComponent<SteamVR_TrackedObject>();
                     UnityEngine.Object.DontDestroyOnLoad(camRoot);
                     headsetPos = CamFix.vrCamera.transform.localPosition;
+                    vrCamera.gameObject.AddComponent<AudioListener>();
 
                 }
                 else {
