@@ -36,6 +36,11 @@ namespace TormentedSoulsVR.UI
 
                 __instance.transform.parent = CamFix.camRoot.transform;
                 CamFix.menus = __instance;
+                RectTransform mainCanvas = (RectTransform)__instance.m_normalMenuView.canvas_Animator.transform;
+                mainCanvas.localScale = new Vector3(0.6667f, 0.6667f, 0.6667f);
+                mainCanvas.sizeDelta = new Vector2(3840, 2160);
+                mainCanvas.anchoredPosition3D = new Vector3(0, 0, 0);
+
                 __instance.transform.localScale = new Vector3(0.0003f, 0.0003f, 0.0003f);
                 // In the intro the HUD needs to be at a lower pos
                 if (SceneManager.GetActiveScene().name == "IntroScene")
