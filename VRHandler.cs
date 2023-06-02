@@ -1,4 +1,5 @@
 ﻿using HarmonyLib;
+using JetBrains.Annotations;
 using Rewired;
 using System.Reflection;
 using TormentedSoulsVR.UI;
@@ -11,7 +12,7 @@ namespace TormentedSoulsVR
 {
     internal class VRHandler : MonoBehaviour
     {
-       
+        public float heightOffset = 1.575f;       
         private void Awake()
         {
             //PlayerPrefs.SetInt("XBOX_EN", 1);
@@ -19,6 +20,7 @@ namespace TormentedSoulsVR
             Harmony.CreateAndPatchAll(Assembly.GetExecutingAssembly());
 
             SteamVR_Actions.PreInitialize();
+
 
             SteamVR_Settings.instance.pauseGameWhenDashboardVisible = true;
 
@@ -61,7 +63,8 @@ namespace TormentedSoulsVR
             }
             else if (CamFix.player != null) {
                 Vector3 newPos = CamFix.headsetPos * -1;
-                newPos.y += 1.575f;
+                //newPos.y += CamFix.player.m_capsuleCollider.height;
+                newPos.y += heightOffset;
                 newPos.z += 0.05f;
                 CamFix.camHolder.transform.localPosition = newPos;
                 CamFix.camRoot.transform.position = CamFix.player.transform.position;

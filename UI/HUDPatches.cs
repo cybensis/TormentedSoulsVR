@@ -145,7 +145,7 @@ namespace TormentedSoulsVR.UI
             {
                 itemResized = true;
                 currentObject.transform.localScale *= 225;
-                currentObject.transform.parent.localPosition = new Vector3(0, 100, 125);
+                currentObject.transform.parent.localPosition = new Vector3(0, 100, 160);
             }
         }
 
