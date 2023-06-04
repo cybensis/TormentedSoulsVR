@@ -31,9 +31,8 @@ namespace TormentedSoulsVR.UI
         [HarmonyPostfix]
         [HarmonyPatch(typeof(GameplayMenuManager), "InitialSetup")]
         private static void FixHUDPosition(GameplayMenuManager __instance) { 
-            if (CamFix.camRoot != null)
+            if (CamFix.camRoot != null && CamFix.menus == null)
             {
-
                 __instance.transform.parent = CamFix.camRoot.transform;
                 CamFix.menus = __instance;
                 RectTransform mainCanvas = (RectTransform)__instance.m_normalMenuView.canvas_Animator.transform;

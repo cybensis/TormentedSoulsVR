@@ -145,7 +145,8 @@ namespace TormentedSoulsVR
                 __instance.transform.position = new Vector3(2.0536f, 1.2608f, -6.093f);
             else if (__instance.name == "Corridor_1A_TrapdoorRope_GameObject") // Trapdoor with rope on it
                 __instance.transform.position = new Vector3(3.1741f, 0.24f, 7.9234f);
-            else if (__instance.name == "ElectricLeverClickReceiver") {
+            else if (__instance.name == "ElectricLeverClickReceiver")
+            {
                 __instance.transform.position = new Vector3(2.0126f, 1.1932f, -6.008f);
                 __instance.transform.parent.localRotation = Quaternion.identity;
             }
@@ -156,9 +157,9 @@ namespace TormentedSoulsVR
             else if (__instance.name == "CoinDropperClickReceiver_GameObject")// Vending machine coin dropper
                 __instance.transform.position = new Vector3(-15.126f, 0.681f, -4.2092f);
             else if (__instance.name == "DrinkCanClickReceiver_GameObject")  // Vending machine item pickup
-            { 
+            {
                 __instance.fakeCursorProxy.transform.position = new Vector3(-15.088f, 0.779f, -4.3973f);
-                __instance.fakeCursorProxy.transform.localRotation = Quaternion.Euler(60,0,0);
+                __instance.fakeCursorProxy.transform.localRotation = Quaternion.Euler(60, 0, 0);
             }
             else if (__instance.name == "FloppyDriveSlotClickReceiver_GameObject" && SceneManager.GetActiveScene().name == "Corridor_2D")// Floppy disk door lock
                 __instance.fakeCursorProxy.transform.position = new Vector3(-11.9607f, 1.1277f, -1.3798f);
@@ -180,8 +181,71 @@ namespace TormentedSoulsVR
                 __instance.fakeCursorProxy.transform.position = new Vector3(-0.2406f, 0.807f, -14.29f);
             else if (__instance.name == "BatteryClickReceiver_GameObject" && SceneManager.GetActiveScene().name == "Library") // Library hydraulic lift battery
                 __instance.fakeCursorProxy.transform.position = new Vector3(-14.4294f, 1.4791f, -3.2173f);
+            else if (__instance.name == "SewerRoom_LeftClickReceiver") // Sewer bedroom mirror left candle
+                __instance.fakeCursorProxy.transform.position = new Vector3(-4.4423f, 1.887f, 0.3838f);
+            else if (__instance.name == "SewerRoom_RightClickReceiver") // Sewer bedroom mirror right candle
+                __instance.fakeCursorProxy.transform.position = new Vector3(-4.6621f, 1.877f, 0.7939f);
+            else if (__instance.name == "BathroomAPast_EyeReceiver_GameObject") // Bathtub eye 
+                __instance.fakeCursorProxy.transform.position = new Vector3(-2.626f, 1.013f, -20.741f);
+            else if (__instance.name == "Sewer_ButtonRight_GameObject") // Bathtub eye 
+            {
+                __instance.fakeCursorProxy.transform.localScale = new Vector3(0.1574f, 0.1096f, 0.1574f);
+                __instance.transform.localRotation = Quaternion.identity;
+            }
+            else if (__instance.name == "BunkerEntrance_Start_GameObject") // Bunker green button
+                __instance.fakeCursorProxy.transform.position = new Vector3(1.121f, -2.0664f, 1.2299f);
+            else if (__instance.name == "BunkerEntrance_Stop_GameObject") // Bunker red button
+                __instance.fakeCursorProxy.transform.position = new Vector3(1.0417f, -2.1317f, 1.3099f);
+            else if (__instance.name == "BunkerEntrance_RightLock_GameObject") // Bunker lock
+                __instance.fakeCursorProxy.transform.position = new Vector3(0.8918f, -2.1712f, 0.9148f);
+            else if (__instance.name == "TopClickReceiver_GameObject") // Generator gas tank lid
+                __instance.fakeCursorProxy.transform.position = new Vector3(-2.891f, -9.947f, -0.742f);
+            else if (__instance.name == "RopeCLickReceiver_GameObject") // Generator Pull start
+                __instance.fakeCursorProxy.transform.position = new Vector3(-2.858f, -9.958f, -0.955f);
+            else if (SceneManager.GetActiveScene().name == "Bunker_2B") // Valve puzzle stuff
+            {
+                if (__instance.name == "PipesPlug0ClickReceiver")
+                    __instance.fakeCursorProxy.transform.position = new Vector3(0.8571f, 1.6926f, -6.2104f);
+                else if (__instance.name == "PipesPlug1ClickReceiver")
+                    __instance.fakeCursorProxy.transform.position = new Vector3(0.9344f, 1.469f, -6.248f);
+                else if (__instance.name == "PipesPlug2ClickReceiver")
+                    __instance.fakeCursorProxy.transform.position = new Vector3(0.745f, 1.49f, -6.454f);
+                else if (__instance.name == "PipesPlug3ClickReceiver")
+                    __instance.fakeCursorProxy.transform.position = new Vector3(0.4122f, 1.5731f, -6.473f);
+                else if (__instance.name == "PipesPlug4ClickReceiver")
+                    __instance.fakeCursorProxy.transform.position = new Vector3(0.728f, 1.3521f, -6.5086f);
+                else if (__instance.name == "PipesPlug5ClickReceiver")
+                    __instance.fakeCursorProxy.transform.position = new Vector3(0.8758f, 1.336f, -6.3641f);
+                else if (__instance.name == "PipesPlug6ClickReceiver") 
+                    __instance.fakeCursorProxy.transform.position = new Vector3(0.617f, 1.323f, -6.263f);
+            }
+            else if (__instance.name == "ExitDoorKeyClickReceiver") // Ending door receiver
+                __instance.fakeCursorProxy.transform.position = new Vector3(-2.17f, 2.247f, -3.809f);
         }
 
+
+        [HarmonyPostfix]
+        [HarmonyPatch(typeof(GasPipelineValve), "SetupButton")]
+        private static void RepositionValveInteractions(GasPipelineValve __instance) {
+            if (__instance.name == "Logic0")
+                __instance.transform.position = new Vector3(0.784f, 1.6692f, -6.2766f);
+            else if (__instance.name == "Logic1")
+                __instance.transform.position = new Vector3(0.8667f, 1.5546f, -6.5771f);
+            else if (__instance.name == "Logic2")
+                __instance.transform.position = new Vector3(0.741f, 1.558f, -6.5771f);
+            else if (__instance.name == "Logic3")
+                __instance.transform.position = new Vector3(0.6248f, 1.559f, -6.6742f);
+            else if (__instance.name == "Logic4")
+                __instance.transform.position = new Vector3(0.567f, 1.5239f, -6.6771f);
+            else if (__instance.name == "Logic5")
+                __instance.transform.position = new Vector3(0.4795f, 1.5459f, -6.5798f);
+            else if (__instance.name == "Logic6")
+                __instance.transform.position = new Vector3(0.8667f, 1.447f, -6.3771f);
+            else if (__instance.name == "Logic7")
+                __instance.transform.position = new Vector3(0.567f, 1.4098f, -6.3771f);
+            else if (__instance.name == "Logic8")
+                __instance.transform.position = new Vector3(0.674f, 1.344f, -6.5771f);
+        }
 
         [HarmonyPostfix]
         [HarmonyPatch(typeof(SpendingMachineButton), "SetupButton")]
@@ -347,6 +411,7 @@ namespace TormentedSoulsVR
             camRoot.transform.rotation = __instance.transform.rotation;
             player = __instance;
             player.m_moveBehaviour.m_runSpeed = 7f;
+            vrCamera.cullingMask = Camera.main.cullingMask;
             // For some reason the player models gets bigger i think in the sewer part so increase the height for this scene
             if (SceneManager.GetActiveScene().name == "Sewer")
                 vrHandlerInstance.heightOffset = 1.82f;
@@ -470,7 +535,7 @@ namespace TormentedSoulsVR
             else if (camName == "Corridor1C_VirtualCamera0_GameObject")                                                             // Alien/human door puzzle
                 __instance.virtualCamera.transform.position = new Vector3(-1.06f, 0.939f, -11.307f);
             else if (camName == "Archives_VirtualCamera0")                                                                          // Tetris door puzzle
-            { 
+            {
                 __instance.virtualCamera.transform.position = new Vector3(-13.3091f, 0.865f, 5.8446f);
                 __instance.virtualCamera.transform.localRotation = Quaternion.Euler(354f, 257f, 268f);
             }
@@ -557,8 +622,8 @@ namespace TormentedSoulsVR
                 __instance.virtualCamera.transform.position = new Vector3(-0.2085f, 1.3743f, 0.0758f);
             else if (camName == "Corridor1D_ClockVirtualCamera_GameObject")                                                        // Clock puzzle
             {
-                __instance.virtualCamera.transform.position = new Vector3(-6.0596f, 1.586f, - 0.4758f);
-                __instance.virtualCamera.transform.localRotation = Quaternion.Euler(0,283,0);
+                __instance.virtualCamera.transform.position = new Vector3(-6.0596f, 1.586f, -0.4758f);
+                __instance.virtualCamera.transform.localRotation = Quaternion.Euler(0, 283, 0);
             }
             else if (camName == "Panel Camera" && SceneManager.GetActiveScene().name == "Office")                                   // Music puzzle
             {
@@ -574,6 +639,73 @@ namespace TormentedSoulsVR
             {
                 __instance.virtualCamera.transform.position = new Vector3(-0.0026f, 0.6112f, -13.6073f);
                 __instance.virtualCamera.transform.parent.GetChild(1).position = new Vector3(-0.1834f, 1.0076f, -14.2398f);
+            }
+            else if (camName == "SewerRoom_MirrorCamera")                                                                           // Sewer bedroom mirror puzzle
+            {
+                __instance.virtualCamera.transform.position = new Vector3(-3.8403f, 1.992f, 0.7181f);
+                __instance.virtualCamera.transform.localRotation = Quaternion.Euler(0, 341, 0);
+            }
+            else if (camName == "TvPuzzleSafeCamera_GameObject")                                                                    // Sewer bedroom safe puzzle
+                __instance.virtualCamera.transform.position = new Vector3(-2.6361f, 1.87f, -1.6686f);
+            else if (camName == "TvPuzzleMirrorCamera_GameObject")                                                                    // Sewer bedroom tv puzzle
+                __instance.virtualCamera.transform.position = new Vector3(-1.842f, 1.645f, -2.076f);
+            else if (camName == "ClosetPuzzle_VirtualCamera")                                                                       // Childrens room puzzle
+            {
+                __instance.virtualCamera.transform.position = new Vector3(-7.665f, 1.5766f, 1.0269f);
+                __instance.virtualCamera.transform.localRotation = Quaternion.Euler(0f, 89f, 0f);
+            }
+            else if (camName == "BathroomAPast_Camera_GameObject")                                                                  // Bathtub puzzle
+            {
+                __instance.virtualCamera.transform.position = new Vector3(-2.659f, 1.331f, -21.291f);
+                __instance.virtualCamera.transform.parent.GetChild(1).position = new Vector3(-3.303f, 1.09f, -20.971f);
+            }
+            else if (camName == "Sewer_CameraLeft_GameObject")                                                                       // Sewer left eye thing
+            {
+                __instance.virtualCamera.transform.position = new Vector3(5.315f, -1.964f, -9.948f);
+                __instance.virtualCamera.transform.localRotation = Quaternion.Euler(0f, 0f, 0f);
+            }
+            else if (camName == "Sewer_CameraRight_GameObject")                                                                       // Sewer right eye thing
+            {
+                __instance.virtualCamera.transform.position = new Vector3(-0.986f, -1.998f, -10.071f);
+                __instance.virtualCamera.transform.localRotation = Quaternion.Euler(0f, 7.6f, 0f);
+            }
+            else if (camName == "BunkerEntranceCamera_GameObject")                                                                  // Bunker entrance puzzle
+            {
+                __instance.virtualCamera.transform.position = new Vector3(0.645f, -2.035f, 1.483f);
+                __instance.virtualCamera.transform.localRotation = Quaternion.Euler(0f, 149f, 0f);
+            }
+            else if (camName == "PumpEngineCamera_GameObject")                                                                  // Bunker generator puzzle
+                __instance.virtualCamera.transform.position = new Vector3(-2.431f, -9.885f, -0.835f);
+            else if (camName == "Bunker2b_HandleCamera")                                                                            // Gas pump 
+            {
+                __instance.virtualCamera.transform.position = new Vector3(1.181f, 1.039f, -6.151f);
+                __instance.virtualCamera.transform.localRotation = Quaternion.Euler(0f, 89f, 0f);
+            }
+            else if (camName == "Bunker_6BFinalExposition_ZoomCamera ")                                                            // Stairs receiver
+                __instance.virtualCamera.transform.position = new Vector3(3.536f, 0.899f, -8.235f);
+            else if (camName == "PipesCamera")                                                                                      // Valve puzzles 
+            {
+                __instance.virtualCamera.transform.position = new Vector3(0.5708f, 1.488f, -5.816f);
+                __instance.virtualCamera.transform.localRotation = Quaternion.Euler(0f, 180f, 0f);
+            }
+            else if (camName == "Bunker_6BAntidode_VirtualCamera0")                                                                 // Anna 
+            {
+                __instance.virtualCamera.transform.position = new Vector3(5.654f, 2.657f, -11.252f);
+                __instance.virtualCamera.transform.localRotation = Quaternion.Euler(0f, 178f, 0f);
+            }
+            else if (SceneManager.GetActiveScene().name == "Bunker_6A") 
+            { 
+                if (camName == "CameraZoom1_GameObject")                                                                            // Boss fight panel 1 
+                    __instance.virtualCamera.transform.position = new Vector3(6.9501f, -8.418f, 5.337f);
+                else if (camName == "CameraZoom2_GameObject")                                                                       // Boss fight panel 2 
+                    __instance.virtualCamera.transform.position = new Vector3(-16.503f, -3.3318f, 2.742f);
+                else if (camName == "CameraZoom3_GameObject")                                                                       // Boss fight panel 3
+                    __instance.virtualCamera.transform.position = new Vector3(-6.3892f, -4.624f, -10.36f);
+            }
+            else if (camName == "ExitDoorCamera")                                                                                   // Ending door
+            {
+                __instance.virtualCamera.transform.position = new Vector3(-2.209f, 2.37f, -3.427f);
+                __instance.virtualCamera.transform.localRotation = Quaternion.Euler(0f, 174f, 0f);
             }
             else if (camName == "BA_ElevatorVirtualCamera_GameObject" && SceneManager.GetActiveScene().name == "Corridor_1B")       // Elevator panel bottom floor
             {
@@ -612,9 +744,15 @@ namespace TormentedSoulsVR
             }
             else if (SceneManager.GetActiveScene().name == "Stair_Save")                                                            // Stair room save
             {
-                __instance.transform.position = new Vector3(-0.8574f, 1.5401f, -0.0159f);
+                __instance.virtualCamera.transform.position = new Vector3(-0.8574f, 1.5401f, -0.0159f);
                 __instance.virtualCamera.transform.parent.GetChild(1).position = new Vector3(-0.8647f, 1.2111f, -0.4122f);
             }
+            else if (SceneManager.GetActiveScene().name == "SewerRoom")                                                             // Bedroom in sewer
+                __instance.virtualCamera.transform.position = new Vector3(-4.6679f, 1.9721f, 2.0822f);
+            else if (SceneManager.GetActiveScene().name == "Bunker_3C")                                                             // Bunker save
+                __instance.virtualCamera.transform.position = new Vector3(2.0482f, 1.5011f, 0.5886f);
+            else if (SceneManager.GetActiveScene().name == "Bunker_6C")                                                             // Bunker last save
+                __instance.virtualCamera.transform.position = new Vector3(1.2652f, 0.9581f, -4.3462f);
         }
 
 
@@ -640,6 +778,7 @@ namespace TormentedSoulsVR
                     vrCamera.nearClipPlane = 0.001f;
                     vrCamera.clearFlags = CameraClearFlags.SolidColor;
                     vrCamera.backgroundColor = Color.black;
+                    vrCamera.cullingMask = Camera.main.cullingMask;
                     vrCamera.gameObject.AddComponent<SteamVR_TrackedObject>();
                     UnityEngine.Object.DontDestroyOnLoad(camRoot);
                     headsetPos = CamFix.vrCamera.transform.localPosition;

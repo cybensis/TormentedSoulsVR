@@ -42,12 +42,14 @@ namespace TormentedSoulsVR
         [HarmonyPatch(typeof(UnityEngine.Playables.PlayableDirector), "Play", new Type[] { })]
         private static void PositionIntroCinematic(UnityEngine.Playables.PlayableDirector __instance)
         {
-            Canvas cinematicCanvas = __instance.transform.parent.GetChild(1).GetComponent<Canvas>();
-            if (cinematicCanvas != null)
-            {
-                cinematicCanvas.renderMode = RenderMode.WorldSpace;
-                cinematicCanvas.transform.localScale = new Vector3(0.001f, 0.001f, 0.001f);
-                cinematicCanvas.transform.position = new Vector3(0f, 0f, 2.1f);
+            if (SceneManager.GetActiveScene().name == "IntroScene") { 
+                Canvas cinematicCanvas = __instance.transform.parent.GetChild(1).GetComponent<Canvas>();
+                if (cinematicCanvas != null)
+                {
+                    cinematicCanvas.renderMode = RenderMode.WorldSpace;
+                    cinematicCanvas.transform.localScale = new Vector3(0.001f, 0.001f, 0.001f);
+                    cinematicCanvas.transform.position = new Vector3(0f, 0f, 2.1f);
+                }
             }
             else { 
                 CamFix.inCinematic = true;
