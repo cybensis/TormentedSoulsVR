@@ -11,6 +11,7 @@ using TS.Gameplay.Menu;
 using System.Diagnostics;
 using TS.Items;
 using UnityEngine.SceneManagement;
+using FlowDirector.Nodes.Gameplay.Menu;
 
 namespace TormentedSoulsVR.UI
 {
@@ -28,12 +29,39 @@ namespace TormentedSoulsVR.UI
 
         public static Vector3 HUD_POSITION = new Vector3(0f, 1.575f, 0.35f);
 
+        public static float targetHUDYRot = 0;
+
+
+        // When the inv or pause menu is opened set its position and rotation relative to the VR cameras
+        [HarmonyPostfix]
+        [HarmonyPatch(typeof(GameplayMenuGeneralView), "Open")]
+        private static void SetHUDRotationOnOpen(GameplayMenuGeneralView __instance)
+        {
+            if (!CamFix.inCinematic && CamFix.menus != null) {
+                //targetHUDYRot =  CamFix.vrCamera.transform.localEulerAngles.y - CamFix.camHolder.transform.localEulerAngles.y;
+                targetHUDYRot = CamFix.vrCamera.transform.localEulerAngles.y;
+                CamFix.menus.transform.position = CamFix.vrCamera.transform.position + (CamFix.vrCamera.transform.forward * 0.35f);
+            }
+        }
+        [HarmonyPostfix]
+        [HarmonyPatch(typeof(GameplayMenuGeneralView), "Close")]
+        private static void SetHUDRotationOnClose(GameplayMenuGeneralView __instance)
+        {
+            targetHUDYRot = 0f;
+            if (!CamFix.inCinematic && CamFix.menus != null)
+                CamFix.menus.transform.localPosition = HUD_POSITION;
+        }
+
+        // 
         [HarmonyPostfix]
         [HarmonyPatch(typeof(GameplayMenuManager), "InitialSetup")]
         private static void FixHUDPosition(GameplayMenuManager __instance) { 
-            if (CamFix.camRoot != null && CamFix.menus == null)
+            if (CamFix.camRoot != null)
             {
+
                 __instance.transform.parent = CamFix.camRoot.transform;
+                if (CamFix.camRoot.transform.childCount >= 3)
+                    UnityEngine.Object.Destroy(CamFix.camRoot.transform.GetChild(1).gameObject);
                 CamFix.menus = __instance;
                 RectTransform mainCanvas = (RectTransform)__instance.m_normalMenuView.canvas_Animator.transform;
                 mainCanvas.localScale = new Vector3(0.6667f, 0.6667f, 0.6667f);
@@ -70,6 +98,9 @@ namespace TormentedSoulsVR.UI
                 shadowCanvas.transform.localScale = Vector3.one;
                 shadowCanvas.transform.localPosition = Vector3.zero;
 
+
+                // Disable the renderer for the small cube in the 3D inspect menu
+                __instance.transform.GetChild(2).GetChild(1).GetComponent<MeshRenderer>().enabled = false;
             }
         }
 
@@ -275,28 +306,6 @@ namespace TormentedSoulsVR.UI
 
 
 
-
-        //[HarmonyPrefix]
-        //[HarmonyPatch(typeof(GameplayMenuGeneralView), "DigitalMovement")]
-        ////private static bool AllowHUDMowvement(GameplayMenuGeneralView __instance, ref Vector3 __result) {
-        //private static void AllowHUDMowvement(GameplayMenuGeneralView __instance)
-        //{
-        //    int rows = __instance.GetRows();
-        //    int num = ((NavItemButton)__instance.m_currentOption).gridID / 3 + 1;
-        //    float num2 = 4f;
-        //    float to = 1f - Math.Max((float)num - num2, 0f) / Mathf.Max(1f, (float)rows - num2);
-        //    Debug.LogWarning(to + "      " + num);
-        //    // to should be 1 but if the inv window has so many items you need to scroll down it will go to 0, num should be the column
-
-        //}
-
-        //[HarmonyPrefix]
-        //[HarmonyPatch(typeof(GameplayMenuGeneralView), "PlaceCursorInCurrentOption")]
-        ////private static bool AllowHUDMowvement(GameplayMenuGeneralView __instance, ref Vector3 __result) {
-        //private static void AllowHUDModwvement(GameplayMenuGeneralView __instance) {
-        //    Debug.LogError(__instance.m_menuManager.IsMouseInput() + "     " + __instance.m_currentOption.GetTransform().position);
-        //    // mouseinput should always be false and the position is pretty much always (0.3, 1.5, -3.8) to (0.4, 1.5, -3.8) but thats a world position 
-        //}
 
     }
 }

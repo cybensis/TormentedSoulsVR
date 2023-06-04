@@ -1,6 +1,7 @@
 ﻿using HarmonyLib;
 using System;
 using System.Diagnostics.Eventing.Reader;
+using TormentedSoulsVR.UI;
 using TormentedSoulsVR.VRBody;
 using Unity.Rendering;
 using UnityEngine;
@@ -408,6 +409,7 @@ namespace TormentedSoulsVR
             if (camRoot.transform.childCount >= 2) { 
                 camRoot.transform.GetChild(1).localRotation = Quaternion.identity;
             }
+            HUDPatches.targetHUDYRot = 0f;
             camRoot.transform.rotation = __instance.transform.rotation;
             player = __instance;
             player.m_moveBehaviour.m_runSpeed = 7f;
@@ -424,7 +426,7 @@ namespace TormentedSoulsVR
         }
 
 
-        [HarmonyPostfix]
+            [HarmonyPostfix]
         [HarmonyPatch(typeof(PuzzleModelInteractuable), "Awake")]
         private static void MoveClockEyeInteraction(PuzzleModelInteractuable __instance)
         {
@@ -851,12 +853,7 @@ namespace TormentedSoulsVR
         {
             PlayerController playerController = __instance.m_playerController;
             playerController.OnHitEvent = (Action)Delegate.Remove(playerController.OnHitEvent, new Action(__instance.OnHit));
-            //__instance.m_anim.SetBool("OnLocomotion", value: false);
-            //PlayerController playerController2 = __instance.m_playerController;
-            //playerController2.UserActionEvent = (Action<UserInputManager.UserAction, object>)Delegate.Remove(playerController2.UserActionEvent, new Action<UserInputManager.UserAction, object>(__instance.m_moveBehaviour.ManageInput));
-            //PlayerController playerController3 = __instance.m_playerController;
-            //playerController3.UserActionEvent = (Action<UserInputManager.UserAction, object>)Delegate.Remove(playerController3.UserActionEvent, new Action<UserInputManager.UserAction, object>(__instance.OnUserActionEvent));
-            //__instance.m_moveBehaviour.EnableMovement();
+
             return false;
 
         }
@@ -874,8 +871,8 @@ namespace TormentedSoulsVR
             {
                 return true;
             }
-            // Else if joystick is being used
-            else
+            // Else if joystick is being used and they're not in aiming mode (the left trigger isn't pulled
+            else if (SteamVR_Actions._default.LeftTrigger.axis < 0.7)
             {
 
                 // vector is the input, if its not zero then
@@ -919,9 +916,11 @@ namespace TormentedSoulsVR
                 if (SteamVR_Actions._default.LeftJoystick.axis.y < -0.4)
                 {
                     __instance.animationMove = PlayerMovement.AnimationMove.FloorBack;
-                    __instance.speed = __instance.speed / 2f; 
+                    __instance.speed = __instance.speed / 2f;
                 }
             }
+            else
+                __instance.speed = 0;
             // After calculating the speed based on the factors above, add it to the current speed and start setting the body, animator and sound vars
             float num6 = __instance.speed * __instance.GetCurrentSpeedMultiplier();
             __instance.SetRigidbodySpeed(num6);
@@ -983,7 +982,6 @@ namespace TormentedSoulsVR
             // If the users x and y hmd axis is further away than 0.5 something must be wrong, so limit it to -+0.5
             camDistanceFromBody.x = Mathf.Clamp(camDistanceFromBody.x, -0.5f, 0.5f);
             camDistanceFromBody.z = Mathf.Clamp(camDistanceFromBody.z, -0.5f, 0.5f);
-
 
             // If the camera is beyond -+0.1 distance from the body, then move it in that direction
             if (camDistanceFromBody.x >= 0.1f || camDistanceFromBody.x <= -0.1f)

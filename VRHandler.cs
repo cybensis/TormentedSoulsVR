@@ -59,7 +59,11 @@ namespace TormentedSoulsVR
                 CamFix.camRoot.transform.position = Camera.main.transform.position;
                 CamFix.camHolder.transform.localPosition = (CamFix.headsetPos * -1);
                 CamFix.camRoot.transform.rotation = Quaternion.Euler(0, Camera.main.transform.localEulerAngles.y, 0);
- 
+
+            }
+            // Do this so camera is black during loading screens
+            else if (CamFix.player != null && !CamFix.player.m_playerManager.m_cameraManager.m_cameraInitialized) {
+                CamFix.camRoot.transform.position = new Vector3(100, 100, 100);
             }
             else if (CamFix.player != null) {
                 Vector3 newPos = CamFix.headsetPos * -1;
@@ -69,7 +73,7 @@ namespace TormentedSoulsVR
                 CamFix.camHolder.transform.localPosition = newPos;
                 CamFix.camRoot.transform.position = CamFix.player.transform.position;
                 //CamFix.camRoot.transform.rotation = CamFix.player.transform.rotation;
-                CamFix.menus.transform.localRotation = Quaternion.Euler(0, 0, 0);
+                CamFix.menus.transform.localRotation = Quaternion.Euler(0, HUDPatches.targetHUDYRot, 0);
             }
         }
 
@@ -110,6 +114,7 @@ namespace TormentedSoulsVR
         public static void SetHeight(SteamVR_Action_Boolean fromAction, SteamVR_Input_Sources fromSource)
         {
             CamFix.headsetPos = CamFix.vrCamera.transform.localPosition;
+            //CamFix.camHolder.transform.localRotation = Quaternion.Euler(0,CamFix.vrCamera.transform.localEulerAngles.y * -1,0);
             CamFix.crouchInstance.InitHeight();
         }
     }
