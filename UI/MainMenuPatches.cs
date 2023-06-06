@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using HarmonyLib;
+using TormentedSoulsVR.cam;
 using TS.Gameplay.Menu;
 using UnityEngine;
 using Valve.VR;
@@ -38,7 +39,7 @@ namespace TormentedSoulsVR.UI
             mainMenu.localScale = new Vector3(0.006f, 0.006f, 0.006f);
             mainMenu.position = new Vector3(0, 0, 11.1055f);
 
-            if (CamFix.camRoot.transform.childCount >= 2)
+            if (CamFix.camRoot != null && CamFix.camRoot.transform.childCount >= 2)
                 UnityEngine.Object.Destroy(CamFix.camRoot.transform.GetChild(1).gameObject);
         }
 
@@ -64,61 +65,9 @@ namespace TormentedSoulsVR.UI
             if (timeSinceMoved < NEXT_SELECTION_DELAY)
                 return;
             //Debug.LogWarning(1);
-            if (currentOptionsButton != null) {
-                if (SteamVR_Actions._default.LeftJoystick.axis.y > 0.8)
-                {
-                    currentOptionsButton.m_baseButton.OnExitClick(1);
-                    currentOptionsIndex = (currentOptionsIndex - 1 < 0) ? selectedOptionsPanel.m_options.Count - 1 : currentOptionsIndex - 1;
-                    currentOptionsButton = selectedOptionsPanel.m_options[currentOptionsIndex];
-                    currentOptionsButton.m_baseButton.OnEnterClick(1);
-                    timeSinceMoved = 0;
-                }
-                else if (SteamVR_Actions._default.LeftJoystick.axis.y < -0.8)
-                {
-                    currentOptionsButton.m_baseButton.OnExitClick(1);
-                    currentOptionsIndex += 1;
-                    currentOptionsIndex %= selectedOptionsPanel.m_options.Count;
-                    currentOptionsButton = selectedOptionsPanel.m_options[currentOptionsIndex];
-                    currentOptionsButton.m_baseButton.OnEnterClick(1);
-                    timeSinceMoved = 0;
-                }
-                else if (SteamVR_Actions._default.LeftJoystick.axis.x > 0.8) {
-                    currentOptionsButton.OnButtonPressed(1);
-                    timeSinceMoved = 0;
-                }
-                else if (SteamVR_Actions._default.LeftJoystick.axis.x < -0.8)
-                {
-                    currentOptionsButton.OnButtonPressed(3);
-                    timeSinceMoved = 0;
-                }
-            }
-            else if (currentButton != null)
-            {
-                if (SteamVR_Actions._default.LeftJoystick.axis.y > 0.7)
-                {
-                    currentButtonBehaviour.SelectButton(false);
-                    currentButton = (NavItemButton)currentButton.navigationReferences.up;
-                    currentButtonBehaviour = currentButton.GetTransform().GetComponent<ItemOptionMenuButtonBehaviour>();
-                    currentButtonBehaviour.SelectButton(true);
-                    timeSinceMoved = 0;
-                }
-                else if (SteamVR_Actions._default.LeftJoystick.axis.y < -0.7)
-                {
-                    currentButtonBehaviour.SelectButton(false);
-                    currentButton = (NavItemButton)currentButton.navigationReferences.down;
-                    currentButtonBehaviour = currentButton.GetTransform().GetComponent<ItemOptionMenuButtonBehaviour>();
-                    currentButtonBehaviour.SelectButton(true);
-                    timeSinceMoved = 0;
-
-                }
-                if (SteamVR_Actions._default.ButtonA.stateDown)
-                {
-                    currentButtonBehaviour.FakeOnClick();
-                    timeSinceMoved = 0;
-                }
-            }
-            else
-            {
+            CheckButtonMovement();
+            if (currentButton == null && currentOptionsButton == null)
+             {
                 InitMenuController menuController = (InitMenuController)__instance.menuRefs[0].menuController;
                 currentButton = (NavItemButton)menuController.navItems[0];
                 currentButtonBehaviour = currentButton.GetTransform().GetComponent<ItemOptionMenuButtonBehaviour>();
@@ -131,12 +80,27 @@ namespace TormentedSoulsVR.UI
         [HarmonyPatch(typeof(GM_StateOptionsMenu), "Update")]
         private static void HandleInGameMenuMovement(GM_StateOptionsMenu __instance)
         {
-            if (__instance.m_panelCurrent.name != "OptionsMenu") 
+            if (__instance.m_panelCurrent.name != "OptionsMenu")
                 return;
             timeSinceMoved += Time.deltaTime;
             if (timeSinceMoved < NEXT_SELECTION_DELAY)
                 return;
-            //Debug.LogWarning(1);
+            CheckButtonMovement();
+            if (currentButton == null && currentOptionsButton == null) {
+                OptionsMenuController menuController = __instance.optionsView;
+                currentButton = (NavItemButton)menuController.NavMenuItems[0];
+                currentButtonBehaviour = currentButton.GetTransform().GetComponent<ItemOptionMenuButtonBehaviour>();
+                currentButtonBehaviour.SelectButton(true);
+            }
+            if (SteamVR_Actions._default.ButtonB.stateDown)
+            {
+                __instance.optionsView.OnPressedBackOnPanel(null);
+                timeSinceMoved = 0;
+            }
+        }
+
+
+        private static void CheckButtonMovement() {
             if (currentOptionsButton != null)
             {
                 if (SteamVR_Actions._default.LeftJoystick.axis.y > 0.8)
@@ -192,23 +156,8 @@ namespace TormentedSoulsVR.UI
                     timeSinceMoved = 0;
                 }
             }
-            else
-            {
-                OptionsMenuController menuController = __instance.optionsView;
-                currentButton = (NavItemButton)menuController.NavMenuItems[0];
-                currentButtonBehaviour = currentButton.GetTransform().GetComponent<ItemOptionMenuButtonBehaviour>();
-                currentButtonBehaviour.SelectButton(true);
-
-            }
-            if (SteamVR_Actions._default.ButtonB.stateDown) {
-                __instance.optionsView.OnPressedBackOnPanel(null);
-                timeSinceMoved = 0; 
-            }
 
         }
-
-
-
 
 
 

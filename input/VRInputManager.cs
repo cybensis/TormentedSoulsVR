@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using TormentedSoulsVR.cam;
+using UnityEngine;
 using Valve.VR;
 using Valve.VR.Extras;
 

@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using TormentedSoulsVR.VRBody;
 using UnityEngine;
 using Valve.VR;
+using TormentedSoulsVR.cam;
 
 namespace TormentedSoulsVR.weapons
 {
@@ -46,55 +47,24 @@ namespace TormentedSoulsVR.weapons
         private const string CROWBAR_SWING_SFX_ID = "crowbar_whoosh";
         private string[] attackSounds = {"caroline_crowbar1", "caroline_crowbar2", "caroline_crowbar3"};
 
-        private float attackDelay = 0.75f;
+        private float attackDelay = 1f;
         private float delayLength = 0f;
         private bool delayAttack = false;
         private float delayStartTime;
 
+        private Collider colliderHit;
         private NailerPullerWeaponBehaviour weaponBehaviour;
-
-        void Start() {
-            transform.parent.gameObject.active = true;
-        }
-
-        void OnDisable()
-        {
-            if (transform.parent.name == "shootTip")
-                transform.parent.gameObject.active = true;
-        }
 
         void Update()
         {
-            if (weaponBehaviour == null) {
-                Debug.LogWarning(transform.GetComponent<ColliderEventSender>() + " " + transform.GetComponent<ColliderEventSender>().OnTriggerEnterAction + " " + transform.GetComponent<ColliderEventSender>().OnTriggerEnterAction.Target);
+            if (weaponBehaviour == null)
                 weaponBehaviour = transform.GetComponent<ColliderEventSender>().OnTriggerEnterAction.Target as NailerPullerWeaponBehaviour;
-            }
             if (delayAttack && Time.time - delayStartTime > delayLength)
                 delayAttack = false;
             else if (delayAttack)
                 return;
 
             float swingVelocity =  Mathf.Clamp(SteamVR_Actions._default.SkeletonRightHand.velocity.magnitude, 0, MAX_VELOCITY);
-
-
-            if (swingVelocity >= VELOCITY_THRESHOLD && !isSwinging)
-            {
-                resetSwingVariables();
-                weaponBehaviour.ShootCollider.SetActive(true);
-                swingStart = Time.time;
-                isSwinging = true;
-                Debug.LogError("SWING START");
-            }
-            else if (swingVelocity < VELOCITY_THRESHOLD && isSwinging)
-            {
-                if (swingFired)
-                    SetDelay(attackDelay);
-
-                weaponBehaviour.ShootCollider.SetActive(false);
-                resetSwingVariables();
-                Debug.LogError("SWING END");
-
-            }
 
             // Trigger sound cue
             if (isSwinging && !swingFired && Time.time - swingStart >= SWING_MAINTAINED_THRESHOLD - SWING_VELOCITY_TIME_MODIFIER * ((swingVelocity - VELOCITY_THRESHOLD) / MAX_VELOCITY_MINUS_THRESHOLD))
@@ -104,14 +74,7 @@ namespace TormentedSoulsVR.weapons
                 currentAttackSound = (currentAttackSound + 1) % TOTAL_ATTACK_SOUNDS;
                 CamFix.player.m_sfxManager.PlaySFX(CROWBAR_SWING_SFX_ID, 1, 1);
                 //weaponBehaviour.Attack();
-            }
-
-        }
-
-        void OnTriggerEnter(Collider other)
-        {
-            if (isSwinging && !hitFired) {
-                if (weaponBehaviour.IsTarget(other.transform) && weaponBehaviour.IsInLineOfSight(other) && weaponBehaviour.CheckIfMakesDamage(other.transform))
+                if (weaponBehaviour.IsTarget(colliderHit.transform) && weaponBehaviour.IsInLineOfSight(colliderHit) && weaponBehaviour.CheckIfMakesDamage(colliderHit.transform))
                 {
                     hitFired = true;
                     weaponBehaviour.m_owner.GetComponentInParent<PlayerController>().RequestCameraShake();
@@ -119,7 +82,36 @@ namespace TormentedSoulsVR.weapons
                 }
 
             }
-            Debug.LogError(other);
+
+            if (swingVelocity >= VELOCITY_THRESHOLD && !isSwinging)
+            {
+                resetSwingVariables();
+                swingStart = Time.time;
+                isSwinging = true;
+                Debug.LogError("SWING START");
+            }
+            else if (swingVelocity < VELOCITY_THRESHOLD && isSwinging)
+            {
+                if (swingFired) {
+                    if (!hitFired && weaponBehaviour.IsTarget(colliderHit.transform) && weaponBehaviour.IsInLineOfSight(colliderHit) && weaponBehaviour.CheckIfMakesDamage(colliderHit.transform)) {
+                        hitFired = true;
+                        weaponBehaviour.m_owner.GetComponentInParent<PlayerController>().RequestCameraShake();
+                        weaponBehaviour.RequestJoystickRumble();
+                    }
+                    SetDelay(attackDelay);
+                }
+                resetSwingVariables();
+                Debug.LogError("SWING END");
+
+            }
+
+
+        }
+
+        void OnTriggerEnter(Collider other)
+        {
+            colliderHit = other;
+
         }
 
         private void resetSwingVariables()

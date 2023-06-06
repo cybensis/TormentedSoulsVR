@@ -23,21 +23,6 @@ namespace TormentedSoulsVR.weapons
 
 
 
-
-        [HarmonyPrefix]
-        [HarmonyPatch(typeof(GlobalSFXManager), "PlaySFX")]
-        private static void DisableCrowbarAttacwkFunction(GlobalSFXManager __instance, string id)
-        {
-            Debug.LogError(id);
-        }
-
-        [HarmonyPrefix]
-        [HarmonyPatch(typeof(GlobalSFXManager), "PlaySFXWithLocation")]
-        private static void DisableCrowbarAttacwwkFunction(GlobalSFXManager __instance, string id)
-        {
-            Debug.LogError(id);
-        }
-
         [HarmonyPrefix]
         [HarmonyPatch(typeof(NailerPullerWeaponBehaviour), "OnTriggerEnter")]
         private static bool DisableNormalCrowbarAttackBehaviour(NailerPullerWeaponBehaviour __instance)
@@ -51,6 +36,8 @@ namespace TormentedSoulsVR.weapons
         [HarmonyPatch(typeof(WeaponBase), "PositionParts")]
         private static bool AddVRCrouch(WeaponBase __instance, Transform mountPointLeft, Transform mountPointRight)
         {
+            if (__instance.name == "Lighter_equip(Clone)")
+                return true;
             if ((bool)__instance.LeftHandMesh)
             {
                 __instance.SetHandBone(mountPointRight, __instance.LeftHandMesh.transform);
@@ -78,7 +65,7 @@ namespace TormentedSoulsVR.weapons
             else if (__instance.name == "Crowbar_Equip(Clone)") { 
                 if ((__instance.m_weaponBehaviour as NailerPullerWeaponBehaviour).ColliderEventSender.gameObject.GetComponent<VRCrowbar>() == null)
                     (__instance.m_weaponBehaviour as NailerPullerWeaponBehaviour).ColliderEventSender.gameObject.AddComponent<VRCrowbar>();
-                (__instance.m_weaponBehaviour as NailerPullerWeaponBehaviour).ColliderEventSender.transform.parent.gameObject.active = true;
+                (__instance.m_weaponBehaviour as NailerPullerWeaponBehaviour).ColliderEventSender.transform.parent = (__instance.m_weaponBehaviour as NailerPullerWeaponBehaviour).ColliderEventSender.transform.parent.parent;
             }
             return false;
         }

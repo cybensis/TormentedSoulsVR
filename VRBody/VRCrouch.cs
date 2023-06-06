@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using TormentedSoulsVR.cam;
+using UnityEngine;
 
 namespace TormentedSoulsVR.VRBody
 {

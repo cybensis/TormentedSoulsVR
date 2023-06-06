@@ -1,4 +1,5 @@
 ﻿using HarmonyLib;
+using TormentedSoulsVR.cam;
 using TormentedSoulsVR.VRBody;
 using UnityEngine;
 

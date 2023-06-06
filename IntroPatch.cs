@@ -1,5 +1,6 @@
 ﻿using HarmonyLib;
 using System;
+using TormentedSoulsVR.cam;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -65,6 +66,7 @@ namespace TormentedSoulsVR
         {
             CamFix.inCinematic = false;
         }
+
 
 
 

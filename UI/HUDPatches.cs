@@ -12,6 +12,7 @@ using System.Diagnostics;
 using TS.Items;
 using UnityEngine.SceneManagement;
 using FlowDirector.Nodes.Gameplay.Menu;
+using TormentedSoulsVR.cam;
 
 namespace TormentedSoulsVR.UI
 {
@@ -25,7 +26,7 @@ namespace TormentedSoulsVR.UI
         public static Canvas hudCanvas;
 
         private static bool buttonAlreadyPressed = false;
-        private static bool leftJoyUsedLast = false;
+        private static bool rightJoyUsedLast = false;
 
         public static Vector3 HUD_POSITION = new Vector3(0f, 1.575f, 0.35f);
 
@@ -41,6 +42,8 @@ namespace TormentedSoulsVR.UI
                 //targetHUDYRot =  CamFix.vrCamera.transform.localEulerAngles.y - CamFix.camHolder.transform.localEulerAngles.y;
                 targetHUDYRot = CamFix.vrCamera.transform.localEulerAngles.y;
                 CamFix.menus.transform.position = CamFix.vrCamera.transform.position + (CamFix.vrCamera.transform.forward * 0.35f);
+                // Disable the renderer for the small cube in the 3D inspect menu
+                __instance.Gui3DObjectAnimator.transform.GetChild(1).GetComponent<MeshRenderer>().enabled = false;
             }
         }
         [HarmonyPostfix]
@@ -48,11 +51,14 @@ namespace TormentedSoulsVR.UI
         private static void SetHUDRotationOnClose(GameplayMenuGeneralView __instance)
         {
             targetHUDYRot = 0f;
-            if (!CamFix.inCinematic && CamFix.menus != null)
+            if (!CamFix.inCinematic && CamFix.menus != null) { 
                 CamFix.menus.transform.localPosition = HUD_POSITION;
+                // Disable the renderer for the small cube in the 3D inspect menu
+                __instance.Gui3DObjectAnimator.transform.GetChild(1).GetComponent<MeshRenderer>().enabled = false;
+            }
         }
 
-        // 
+
         [HarmonyPostfix]
         [HarmonyPatch(typeof(GameplayMenuManager), "InitialSetup")]
         private static void FixHUDPosition(GameplayMenuManager __instance) { 
@@ -128,8 +134,13 @@ namespace TormentedSoulsVR.UI
         private static bool EnableRaycastForFakeCursor(GameplayMenuFakeCursor __instance)
         {
 
-            if (!__instance.panelEnabled && !leftJoyUsedLast)
+            // If the player is trying to select an item from the inventory and an interactable is behind it, it interacts with it and
+            // can sometimes prevent selecting the inv item because of it so if the left joystick is being used, that means the user is
+            // navigating the inv and not using the fake cursor, ergo disable the raycasting
+            if (!__instance.panelEnabled || !rightJoyUsedLast) {
+                __instance.lastElement = null; 
                 return false;
+            }
             Vector3 fwd = __instance.transform.TransformDirection(Vector3.forward);
             RaycastHit hit;
             IFakeClick fakeClick = null;
@@ -210,7 +221,7 @@ namespace TormentedSoulsVR.UI
         // This is called by GM_StateOptionsMenu I think, a lot of the input handling and method calling seems to come from the GM_ classes
         [HarmonyPrefix]
         [HarmonyPatch(typeof(GameplayMenuGeneralView), "UpdateCursorPosition")]
-        private static bool AllowHUDMowvement(GameplayMenuGeneralView __instance, ref Vector3 __result)
+        private static bool AllowHUDMovement(GameplayMenuGeneralView __instance, ref Vector3 __result)
         {
 
 
@@ -226,7 +237,7 @@ namespace TormentedSoulsVR.UI
             newPos.y += yAxis * (600 * Time.deltaTime);
             if (xAxis != 0 || yAxis != 0)
             {
-                leftJoyUsedLast = true;
+                rightJoyUsedLast = true;
                 __instance.Cursor.UpdatePosition(newPos);
                 __instance.Cursor.MouseOff = false;
             }
@@ -241,12 +252,12 @@ namespace TormentedSoulsVR.UI
                         __instance.Cursor.MouseOff = true;
                     }
                     __instance.DigitalMovement();
-                    leftJoyUsedLast = false;
+                    rightJoyUsedLast = false;
                 }
             }
 
             __result = __instance.Cursor.MousePosition;
-            if (!leftJoyUsedLast && !buttonAlreadyPressed && SteamVR_Actions._default.ButtonA.stateDown && __instance.currentOption != null)
+            if (!rightJoyUsedLast && !buttonAlreadyPressed && SteamVR_Actions._default.ButtonA.stateDown && __instance.currentOption != null)
             {
                 buttonAlreadyPressed = true;
                 NavItemButton curSelection = (NavItemButton)__instance.currentOption;
