@@ -26,6 +26,9 @@ This mod converts the fixed-perspective third-person game to a first-person 6DOF
 
 <br>
 
+## bHaptics Support
+A mod made by [Astienth](https://github.com/Astienth) adds bHaptics suport to the game for a more realistic experience, the mod can be found on their GitHub [here](https://github.com/Astienth/TormentedSouls_bHaptics).
+
 ## <b>Development setup</b>
 
 If you want to help with developing this mod or build it yourself, start by downloading the source code, then in a terminal navigate to the source code folder and enter
